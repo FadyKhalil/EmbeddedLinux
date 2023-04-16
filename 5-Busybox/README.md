@@ -109,7 +109,7 @@ sudo umount /media/SDCARD
 ## Setup Bootargs in U-boot
 
 ```bash
-setenv bootargs console=ttyXXX root=/dev/mmblck0 init=/sbin/init
+setenv bootargs 'console=ttyO0,115200n8 root=/dev/mmcblk0p2 rootfstype=ext4 rw rootwait init=/sbin/init'
 # console is set depends on the machine
 ```
 

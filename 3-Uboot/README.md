@@ -40,7 +40,14 @@ make vexpress_ca9x4_defconfig
 First we need to download the **compiler** for the architecture set for **RPI**
 
 ```bash
-sudo apt-get install arm-linux-gnueabihf-
+# update the package manager
+sudo apt-get update
+
+# the following compiler support 32 bit architecture
+sudo apt-get install gcc-arm-linux-gnueabihf-
+
+# in case of using architecture 64 Download the following compiler
+sudo apt-get install gcc-aarch64-linux-gnu
 ```
 
 ##### Raspberry Pi 3
@@ -70,6 +77,18 @@ export ARCH=arm
 # load the default configuration of rpi 3
 make rpi_4_32b_defconfig
 ```
+
+**In case of 64 architecture**
+
+```bash
+export CROSS_COMPILE=aarch64-linux-gnu-
+export ARCH=arm64
+
+# depends what raspberry pi in used
+make rpi_4_b_defconfig
+```
+
+
 
 #### Beaglebone
 
@@ -134,7 +153,7 @@ lsblk
 ### WARNING ####
 sudo dd if=/dev/zero of=/dev/mmblk<x> bs=1M
 
-# is not always mmblck to make sure the command lsblk is used
+# is not always mmblck to make sure use the command lsblk
 
 # Assign the Block device as global variable to be treated as MACRO
 export DISK=/dev/mmblck<x>
@@ -157,7 +176,7 @@ cfdisk /dev/mmblck<x>
 |    `200 MB`    |     `FAT 16`     | ***Yes*** |
 |    `300 MB`    |     `Linux`      | ***No***  |
 
-`write` to apply changes
+**write** to apply changes
 
 ### Loop Driver FOR Virtual usage ONLY
 
@@ -172,7 +191,7 @@ sudo losetup -f --show --partscan sd.img
 # take it and assign it like down bellow command
 
 # Assign the Block device as global variable to be treated as MACRO
-export DISK=/dev/loop<x>p1
+export DISK=/dev/loop<x>
 ```
 
 ### Format Partition Table

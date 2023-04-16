@@ -77,6 +77,8 @@ In order to configure SSH and add the executable in rootfs in **buildroot**
 # It will build the buildroot 
 # Register the logs for debugging
 make 2>&1 | tee build.log
+
+#### WARNING it will take up to 2 hours ####
 ```
 
 ## Configure Embedded Linux Component
@@ -101,3 +103,25 @@ make uboot-menuconfig
 # to configure busybox
 make busybox-menuconfig
 ```
+
+## Boot The System
+
+### Qemu
+
+```bash
+# Run the system on Qemu
+qemu-system-arm -M vexpress-a9 -m 128M -sd output/image/sdcard.img -kernel output/image/u-boot.img -nograhic
+```
+
+### BeagleBone
+
+```bash
+# First we need to format the sd card
+dd if=/dev/zero of=/dev/mmcblk0 bs=1M
+#### warning it will take some time ####
+
+# Add the Sd image to the SD card
+dd if=output/images/sdcard.img of=/dev/mmcblk0 bs=1M
+```
+
+### Raspberry Pi
