@@ -60,6 +60,9 @@ make menuconfig
 In the configuration, configure the following **requirement**:
 
 - [ ]  Init procecss to **System V** or **System D** or **Busybox init**
+
+`In case of using systemD increase the root file system size from build root configuartion`
+
 - [ ]  Change **system host**
 - [ ] Change **system banner**
 - [ ]  Appy **root password**
