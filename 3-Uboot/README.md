@@ -88,8 +88,6 @@ export ARCH=arm64
 make rpi_4_b_defconfig
 ```
 
-
-
 #### Beaglebone
 
 In **U-boot directory** Assign this value
