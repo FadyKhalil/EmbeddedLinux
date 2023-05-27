@@ -113,3 +113,27 @@ setenv bootargs 'console=ttyO0,115200n8 root=/dev/mmcblk0p2 rootfstype=ext4 rw r
 # console is set depends on the machine
 ```
 
+# System configuration and startup 
+
+The first user space program that gets executed by the kernel is `/sbin/init` and its configuration
+file is `/etc/inittab`. in `inittab` we are executing `::sysinit:/etc/init.d/rcS`but this file doesn't exist.
+
+create `/etc/init.d/rcS` startup script and in this script mount `/proc` `/sys` filesystems:
+
+```sh 
+#!/bin/sh
+# mount a filesystem of type `proc` to /proc
+mount -t proc nodev /proc
+# mount a filesystem of type `sysfs` to /sys
+mount -t sysfs nodev /sys
+# you can create `/dev` and execute `mdev -s` if you missed the `devtmpfs` configuration  
+```
+
+Note: `can't run '/etc/init.d/rcS': Permission denied` , use 
+
+```sh
+#inside `rootfs` folder
+chmod +x ./etc/init.d/rcS # to give execution permission for rcS script
+#restart
+```
+
