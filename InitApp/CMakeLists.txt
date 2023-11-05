@@ -1,3 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
 project(HELLODEAMON)
 add_executable(hellodeamon deamonapp.c)
+set(CMAKE_C_COMPILER "/home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/bin/arm-cortexa9_neon-linux-gnueabihf-gcc")
+set(CMAKE_EXE_LINKER_FLAGS "-static")

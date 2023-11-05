@@ -2,13 +2,33 @@
 
 Yocto Project provides a flexible toolset and a development environment that allows embedded device developers across the world to collaborate through shared technologies, software stacks, configurations, and best practices used to create these tailored Linux images.
 
+To understand the outcome provided by the Yocto Project is set of instruction to give an output:
+
+Input: Set of data that describes what we want, that is our specification 
+	*(Kernel Configuration, Hardware Name, Packages/Binaries to be installed)*
+
+Output: Linux Based Embedded Product 
+		*(Linux Kernel, Root File System, Bootloader, Device Tree, Toolchain)*
+
+## Setting up Build Machine
+
+1. 50 Gb of free disk
+2. Runs a supported linux distribution (example: Ubuntu, Fedora...)
+3. 	Git 1.8.3.1 or greater
+   	
+   	tar 1.27 or greater
+   	
+   	Python 3.4.0 or greater.
+
 ## Setting Host Environment
 
 Need to download the following essential tool to build yocto project
 
 ```bash
 sudo apt-get install gawk wget git-core diffstat unzip texinfo gcc-multilib \
-build-essential chrpath socat libsdl1.2-dev xterm
+build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
+xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev \
+pylint3 xterm
 ```
 
 ## Download Yocto Project

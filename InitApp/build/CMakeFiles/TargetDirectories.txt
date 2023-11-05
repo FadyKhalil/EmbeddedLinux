@@ -1,0 +1,3 @@
+/home/fady/EmbeddedLinux/InitApp/build/CMakeFiles/hellodeamon.dir
+/home/fady/EmbeddedLinux/InitApp/build/CMakeFiles/edit_cache.dir
+/home/fady/EmbeddedLinux/InitApp/build/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,34 @@
+CMakeFiles/hellodeamon.dir/deamonapp.c.o: \
+ /home/fady/EmbeddedLinux/InitApp/deamonapp.c \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/stdc-predef.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/stdio.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/libc-header-start.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/features.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/features-time64.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/wordsize.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/timesize.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/sys/cdefs.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/long-double.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/gnu/stubs.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/gnu/stubs-hard.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/lib/gcc/arm-cortexa9_neon-linux-gnueabihf/12.2.0/include/stddef.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/lib/gcc/arm-cortexa9_neon-linux-gnueabihf/12.2.0/include/stdarg.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/types.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/typesizes.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/time64.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/types/__fpos_t.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/types/__mbstate_t.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/types/__fpos64_t.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/types/__FILE.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/types/FILE.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/types/struct_FILE.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/stdio_lim.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/floatn.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/floatn-common.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/unistd.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/posix_opt.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/environments.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/confname.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/getopt_posix.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/getopt_core.h \
+ /home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/arm-cortexa9_neon-linux-gnueabihf/sysroot/usr/include/bits/unistd_ext.h

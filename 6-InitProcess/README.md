@@ -130,12 +130,14 @@ exit 0
 - To kill the application at when getting in specific runlevel we create similar symbolic link
 
   ```sh
+  # Kill the process in runlevel 5
   ln -s ../init.d/deamonapp ./etc/rc5.d/K40deamonapp.sh
+  # Kill the process in runlevel 4
   ln -s ../init.d/deamonapp ./etc/rc4.d/K40deamonapp.sh
   ```
 
   to kill the application we execute
-
+  
   ```sh
   telinit 4 # switching to runlevel 4 will kill the application
   ```

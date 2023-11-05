@@ -23,6 +23,9 @@ make menuconfig
 export CROSS_COMPILE=arm-cortexa9_neon-linux-musleabihf-
 export ARCH=arm
 
+# Configure busybox to be static build from menuconfig
+make menuconfig
+
 #build the busybox to get the minimal command
 make
 

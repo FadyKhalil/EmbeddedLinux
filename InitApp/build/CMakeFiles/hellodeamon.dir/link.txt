@@ -1,0 +1,1 @@
+/home/fady/x-tools/arm-cortexa9_neon-linux-gnueabihf/bin/arm-cortexa9_neon-linux-gnueabihf-gcc -static CMakeFiles/hellodeamon.dir/deamonapp.c.o -o hellodeamon 
