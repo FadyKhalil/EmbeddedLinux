@@ -6,7 +6,7 @@ folder structure
 
 ```sh
 meta_mylayer --> recipes_example --> helloworld |--> files --> helloworld.c
-								 				|--> helloworld.bb
+						|--> helloworld.bb
 ```
 
 ## Source file (helloworld.c)
