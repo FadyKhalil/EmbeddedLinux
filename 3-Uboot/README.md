@@ -133,7 +133,7 @@ In order to Emulate SD card to attached to Qemu following steps will be followed
 cd ..
 
 # Create a file with 1 GB filled with zeros
-dd if=/dev/zero of=sd.img bs=1M count=1000
+dd if=/dev/zero of=sd.img bs=1M count=1024
 ```
 
 ### ! ONLY FOR WHO WORK WITH HW !
