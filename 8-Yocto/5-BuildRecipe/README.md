@@ -54,6 +54,10 @@ do_install() {
 }
 ```
 
+`bindir` represent a configuration variable that added in bitbake which represent that the binary will be installed in **/usr/bin**
+
+`sbindir` represent that the binaries will be installed in **/usr/sbin**
+
 
 
 ### How to Generate md5 Checksum
