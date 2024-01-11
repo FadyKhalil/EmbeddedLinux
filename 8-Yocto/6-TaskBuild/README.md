@@ -8,6 +8,12 @@ To list task inside a recipe we need to run
 bitbake -c listtasks <recipe-name>	
 ```
 
+To clean the recipe 
+
+```
+bitbake -c cleanall <recipe-name>
+```
+
 The output of the task is list in alphabetics order.
 
 The most common tasks are:
