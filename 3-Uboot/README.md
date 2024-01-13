@@ -338,3 +338,33 @@ fatload mmc 0:1 [addressRam] [fileName]
 tftp [addressRam] [fileName]
 ```
 
+
+
+## Write Script in U-boot
+
+```bash
+setenv ifcondition "if mmc dev; then echo MmcExist; elif mtd list; then echo NoDeviceExist; else echo noDeviceExist; fi"
+```
+
+`setenv` 		>>>	 **T**o set a new variable
+
+`ifcondition`       >>> 	**V**ariable name
+
+`if` 			 >>> 	**F**irst condition
+
+`mmc dev` 	      >>>	**I**s command to check there's device available
+
+`then` 		    >>>	**D**o if condition **pass**
+
+`echo` 		    >>>	**P**rint on console
+
+`elif` 		    >>>	**Else if**
+
+`mtd`		       >>>	**C**heck **if** any **nor flash** supported
+
+`then`		     >>>	**E**xecute the else if
+
+`else`		     >>>	**If** condition not **pass** and **elif** not pass execute **else** condition 
+
+`fi`			 >>>	**Y**ou need to end the condition with **fi** (same as linux bash script)
+
