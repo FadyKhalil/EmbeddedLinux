@@ -65,8 +65,15 @@ We need to modify two script:
 - Adding the script in inittab
 
   ```bash
+  # mount proc and sys file system
+  null::sysinit:/bin/mount -t proc proc /proc
+  null::sysinit:/bin/mount -t sysfs sysfs /sys
+  
   # Excute when the system start
   ::sysinit:/etc/init.d/rcS1
+  
+  # ask to enter to the shell
+  console::adkfirst:-/bin/sh
   
   # Excute when the system will go down
   ::shutdown:/etc/init.d/rcK1
@@ -75,11 +82,16 @@ We need to modify two script:
 
 ## SystemV init
 
-in SystemV we have to do some additional setup because runlevel is introduce here
+The **BusyBox init** daemon just described is just a trimmed down version of System V init. Compared to the BusyBox init, System V init has two advantages:
+
+- The boot scripts are written in a well-known formal make it easier to add more packages or bin to run at boot time. 
+- It has the concept of runlevels.
 
 ### Setup
 
 `/etc/init.d/deamonapp`
+
+take in count that **deamonapp** is a script inside the init.d
 
 ```sh
 #! /bin/sh
