@@ -116,6 +116,58 @@ setenv bootargs 'console=ttyO0,115200n8 root=/dev/mmcblk0p2 rootfstype=ext4 rw r
 # console is set depends on the machine
 ```
 
+# Creating initramfs
+
+`initramfs` (initial ramdisk filesystem) is a temporary, early root filesystem that is mounted before the real root filesystem becomes available during the Linux kernel's initialization process. It is commonly used in the boot process to perform tasks such as loading essential kernel modules, configuring devices, and preparing the system for the transition to the actual root filesystem.
+
+## Sequence of instruction
+
+An initial RAM filesystem, or initramfs, is a compressed cpio archive. cpio is an old Unix archive format, similar to TAR and ZIP but easier to decode and so requiring less code in the kernel. You need to configure your kernel with **CONFIG_BLK_DEV_INITRD** to support initramfs.
+
+Make sure do not includes kernel modules in the initramfs as it will take much space.
+
+```bash
+cd ~/rootfs
+find . | cpio -H newc -ov --owner root:root > ../initramfs.cpio
+cd ..
+gzip initramfs.cpio
+mkimage -A arm -O linux -T ramdisk -d initramfs.cpio.gz uRamdisk
+```
+
+## Booting with initramfs
+
+Copy uRamdisk you created earlier in this section to the boot partition on the microSD card, and then use it to boot to point that you get a U-Boot prompt. Then enter these commands:
+
+```bash
+# make sure the variable initramfs doesn't overwrite the dtb and zimage variables
+setenv initramfs [chose a value depends on bdinfo]
+
+fatload mmc 0:1 $kernel_addr_r zImage
+fatload mmc 0:1 $fdt_addr_r am335x-boneblack.dtb
+fatload mmc 0:1 $initramfs uRamdisk
+setenv bootargs console=ttyO0,115200 rdinit=/bin/sh
+
+bootz $kernel_addr_r $initramfs $fdt_addr_r
+```
+
+In bootargs variable you need to configure like this
+
+### Qemu
+
+```bash
+setenv bootargs "console=ttyAMA0 rdinit=/bin/sh"
+```
+
+### BeagleBone
+
+```bash
+setenv bootargs "console=ttyO0,115200 rdinit=/bin/sh"
+```
+
+## NOTE about initramfs
+
+So far, we have created a compressed initramfs as a separate file and used the bootloader to load it into memory. Some bootloaders do not have the ability to load an initramfs file in this way. To cope with these situations, Linux can be configured to incorporate initramfs into the kernel image. To do this, change the kernel configuration and set **CONFIG_INITRAMFS_SOURCE** to the full path of the cpio archive you created earlier. If you are using menuconfig, it is in General setup | Initramfs source file(s). Note that it has to be the uncompressed cpio file ending in .cpio, not the gzipped version. Then, build the kernel.
+
 # System configuration and startup 
 
 The first user space program that gets executed by the kernel is `/sbin/init` and its configuration
