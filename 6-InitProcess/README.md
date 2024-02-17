@@ -111,6 +111,8 @@ esac
 exit 0
 ```
 
+**start-stop-daemon** is a helper function that makes it easier to manipulate background processes such as this. It originally came from the Debian installer package, dpkg, but most embedded systems use the one from BusyBox. It starts the daemon with the -S parameter, making sure that there is never more than one instance running at any one time. To stop a daemon, you use the -K parameter, which causes it to send a signal, SIGTERM by default, to indicate to the daemon that it is time to terminate.
+
 ### Usage of the app
 
 - Ask for Help
@@ -154,3 +156,72 @@ exit 0
   telinit 4 # switching to runlevel 4 will kill the application
   ```
 
+
+
+## System D
+
+- we need to create in systemd filesystem `./etc/systemd/system/deamonapp.service`
+
+```bash
+[Unit]
+Description=app server
+[Service]
+Type=simple
+ExecStart=/bin/deamonapp
+
+[Install]
+WantedBy=multi-user.target
+```
+
+
+
+then you can start and stop it using
+
+```bash
+# start readapp program
+systemctl start deamonapp
+```
+
+but if you execute `ps ` command on terminal it will show that the application is running
+
+```bash
+# stop readapp program
+systemctl stop deamonapp
+```
+
+but if you execute `ps ` command on terminal it will show that the application is **not** there
+
+using
+
+```bash
+systemctl status deamonapp
+```
+
+to see the full log of our application we
+
+```bash
+journalctl -u deamonapp.service
+#or for current boot only
+journalctl -u deamonapp.service -b 
+```
+
+
+
+To make it **persistent**, **permanent** (application will boot for multiuser.target by default) we execute -------> **[Install]** section purpose
+
+```bash
+systemctl enable deamonapp
+```
+
+
+
+```bash
+reboot
+ps # not application is there Executing 
+```
+
+**Note:**
+
+Now, you can see how services add dependencies without having to keep on editing target unit files. A target can have a directory named **<target_name>.target.wants**, which can contain links to services.
+
+This is exactly the same as adding the dependent unit to the **[Wants]** list in the target.
