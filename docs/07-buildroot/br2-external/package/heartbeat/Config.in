@@ -1,0 +1,7 @@
+config BR2_PACKAGE_HEARTBEAT
+	bool "heartbeat"
+	help
+	  Demo daemon of the Embedded Linux course: prints a beat
+	  every few seconds and exits cleanly on SIGTERM.
+	  Installs a start script (BusyBox / System V init) or a
+	  systemd unit, depending on the init system.

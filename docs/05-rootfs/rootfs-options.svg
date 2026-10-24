@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="el-svg" viewBox="0 0 900 260" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<style>
+.el-svg:not(.el-inline){--el-fg:#1f2430;--el-muted:#5f6675;--el-box:#f4f5fb;--el-line:#9aa3b8;--el-accent:#ff5722;--el-accent-soft:#fff0e8;--el-primary:#3f51b5;--el-primary-soft:#e8eaf6;--el-ok:#2e7d32;--el-bad:#c62828}
+@media (prefers-color-scheme:dark){.el-svg:not(.el-inline){--el-fg:#e6e8ee;--el-muted:#9aa1b0;--el-box:#262a36;--el-line:#5c6478;--el-accent:#ff7043;--el-accent-soft:#4a2c20;--el-primary:#7986cb;--el-primary-soft:#2b3152;--el-ok:#66bb6a;--el-bad:#ef5350}}
+.el-svg .box{fill:var(--el-box);stroke:var(--el-line);stroke-width:1.5}
+.el-svg .title{fill:var(--el-fg);font-size:15px;font-weight:600}
+.el-svg .sub{fill:var(--el-muted);font-size:13px}
+.el-svg .mono{fill:var(--el-fg);font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+.el-svg .arrow{stroke:var(--el-line);stroke-width:2;fill:none}
+.el-svg .ahead{fill:var(--el-line)}
+</style>
+<defs>
+<marker id="ah-rfs" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" class="ahead"/></marker>
+</defs>
+<g data-active="1"><rect class="box" x="20" y="100" width="150" height="60" rx="10"/><text class="title" x="95" y="126" text-anchor="middle">Kernel</text><text class="mono" x="95" y="146" text-anchor="middle">root=?</text></g>
+<line class="arrow" x1="172" y1="118" x2="326" y2="46" marker-end="url(#ah-rfs)" data-from="2" data-active="2"/>
+<line class="arrow" x1="172" y1="130" x2="326" y2="130" marker-end="url(#ah-rfs)" data-from="3" data-active="3"/>
+<line class="arrow" x1="172" y1="142" x2="326" y2="214" marker-end="url(#ah-rfs)" data-from="4" data-active="4"/>
+<g data-from="2" data-active="2"><rect class="box" x="330" y="14" width="300" height="56" rx="10"/><text class="title" x="480" y="36" text-anchor="middle">NFS · folder on your PC</text><text class="mono" x="480" y="56" text-anchor="middle">root=/dev/nfs nfsroot=…</text></g>
+<g data-from="3" data-active="3"><rect class="box" x="330" y="102" width="300" height="56" rx="10"/><text class="title" x="480" y="124" text-anchor="middle">SD card · partition 2</text><text class="mono" x="480" y="144" text-anchor="middle">root=/dev/mmcblk0p2</text></g>
+<g data-from="4" data-active="4"><rect class="box" x="330" y="190" width="300" height="56" rx="10"/><text class="title" x="480" y="212" text-anchor="middle">initramfs · loaded into RAM</text><text class="mono" x="480" y="232" text-anchor="middle">rdinit=/sbin/init</text></g>
+<g data-from="5"><line class="arrow" x1="632" y1="42" x2="716" y2="118" marker-end="url(#ah-rfs)"/><line class="arrow" x1="632" y1="130" x2="716" y2="130" marker-end="url(#ah-rfs)"/><line class="arrow" x1="632" y1="218" x2="716" y2="142" marker-end="url(#ah-rfs)"/></g>
+<g data-from="5" data-active="5"><rect class="box" x="720" y="100" width="160" height="60" rx="10"/><text class="title" x="800" y="126" text-anchor="middle">/sbin/init</text><text class="sub" x="800" y="146" text-anchor="middle">PID 1 · lesson 6</text></g>
+</svg>

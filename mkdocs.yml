@@ -1,0 +1,98 @@
+site_name: Embedded Linux From Scratch
+site_description: Build a complete embedded Linux system by hand, then with Buildroot and Yocto.
+site_author: Fady Khalil
+site_url: https://fadykhalil.github.io/EmbeddedLinux/
+repo_url: https://github.com/FadyKhalil/EmbeddedLinux
+repo_name: FadyKhalil/EmbeddedLinux
+edit_uri: edit/main/docs/
+
+# keep page URLs identical to the file layout, so the same relative links
+# (images, animations, scripts) work on GitHub and on the website
+use_directory_urls: false
+
+theme:
+  name: material
+  icon:
+    logo: material/chip
+    repo: fontawesome/brands/github
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.footer
+    - navigation.top
+    - navigation.indexes
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+    - toc.follow
+
+extra_css:
+  - assets/course.css
+extra_javascript:
+  - assets/anim.js
+
+markdown_extensions:
+  - github-callouts
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Home: index.md
+  - Build it by hand:
+      - 1. Libraries: 01-libraries/README.md
+      - 2. Cross toolchain: 02-toolchain/README.md
+      - 3. U-Boot: 03-u-boot/README.md
+      - 4. Linux kernel: 04-kernel/README.md
+      - 5. Root filesystem: 05-rootfs/README.md
+      - 6. Init process: 06-init/README.md
+  - Build systems:
+      - 7. Buildroot: 07-buildroot/README.md
+      - 8. Yocto Project:
+          - 08-yocto/README.md
+          - 8.1 Terminology: 08-yocto/01-terminology.md
+          - 8.2 What to edit: 08-yocto/02-what-to-edit.md
+          - 8.3 Build configuration: 08-yocto/03-build-config.md
+          - 8.4 Layers: 08-yocto/04-layers.md
+          - 8.5 Basic variables: 08-yocto/05-variables.md
+          - 8.6 Variable assignment: 08-yocto/06-variable-assignment.md
+          - 8.7 Your first recipe: 08-yocto/07-first-recipe.md
+          - 8.8 Tasks: 08-yocto/08-tasks.md
+          - BitBake cheat sheet: 08-yocto/09-bitbake-cheatsheet.md
+  - Extras:
+      - CMake:
+          - Overview: extras/cmake/01-overview.md
+          - Basics: extras/cmake/02-basics.md
+          - Variables & cache: extras/cmake/03-variables.md
+          - Control flow & functions: extras/cmake/04-programming.md
+          - Configure & custom commands: extras/cmake/05-configure.md
+          - Cross-compiling with CMake: extras/cmake/06-cross-compiling.md
+      - Helper scripts: scripts/README.md
+      - Lesson template: contributing/lesson-template.md

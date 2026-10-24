@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="el-svg" viewBox="0 0 900 315" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<style>
+.el-svg:not(.el-inline){--el-fg:#1f2430;--el-muted:#5f6675;--el-box:#f4f5fb;--el-line:#9aa3b8;--el-accent:#ff5722;--el-accent-soft:#fff0e8;--el-primary:#3f51b5;--el-primary-soft:#e8eaf6;--el-ok:#2e7d32;--el-bad:#c62828}
+@media (prefers-color-scheme:dark){.el-svg:not(.el-inline){--el-fg:#e6e8ee;--el-muted:#9aa1b0;--el-box:#262a36;--el-line:#5c6478;--el-accent:#ff7043;--el-accent-soft:#4a2c20;--el-primary:#7986cb;--el-primary-soft:#2b3152;--el-ok:#66bb6a;--el-bad:#ef5350}}
+.el-svg .box{fill:var(--el-box);stroke:var(--el-line);stroke-width:1.5}
+.el-svg .soft{fill:var(--el-primary-soft);stroke:var(--el-primary);stroke-width:1.5}
+.el-svg .ghost{fill:none;stroke:var(--el-line);stroke-width:1.2;stroke-dasharray:5 4}
+.el-svg .title{fill:var(--el-fg);font-size:15px;font-weight:600}
+.el-svg .sub{fill:var(--el-muted);font-size:13px}
+.el-svg .mono{fill:var(--el-fg);font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+.el-svg .arrow{stroke:var(--el-line);stroke-width:2;fill:none}
+.el-svg .ahead{fill:var(--el-line)}
+.el-svg .bad{fill:var(--el-bad);font-size:13px;font-weight:600}
+</style>
+<defs>
+<marker id="ah-bootz" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" class="ahead"/></marker>
+</defs>
+<g data-active="1"><rect class="box" x="20" y="20" width="220" height="140" rx="10"/><text class="title" x="130" y="44" text-anchor="middle">TFTP server</text><text class="sub" x="130" y="62" text-anchor="middle">/srv/tftp on the host</text></g>
+<rect class="ghost" x="40" y="80" width="90" height="30" rx="4"/>
+<rect class="ghost" x="40" y="120" width="90" height="30" rx="4"/>
+<g data-active="1"><rect class="box" x="260" y="20" width="380" height="140" rx="10"/><text class="title" x="450" y="44" text-anchor="middle">U-Boot prompt</text></g>
+<text class="mono" x="450" y="78" text-anchor="middle" data-active="2">=&gt; tftp ${kernel_addr_r} zImage</text>
+<text class="mono" x="450" y="104" text-anchor="middle" data-active="3">=&gt; tftp ${fdt_addr_r} board.dtb</text>
+<text class="mono" x="450" y="130" text-anchor="middle" data-active="4">=&gt; bootz ${kernel_addr_r} - ${fdt_addr_r}</text>
+<g data-active="4-5"><rect class="box" x="660" y="20" width="220" height="140" rx="10"/><text class="title" x="770" y="44" text-anchor="middle">CPU</text></g>
+<text class="mono" x="770" y="78" text-anchor="middle" data-from="4">pc = ${kernel_addr_r}</text>
+<text class="mono" x="770" y="100" text-anchor="middle" data-from="4">r2 = ${fdt_addr_r}</text>
+<text class="sub" x="770" y="124" text-anchor="middle" data-from="5">kernel runs, reads the DTB…</text>
+<text class="bad" x="770" y="148" text-anchor="middle" data-from="5">Kernel panic: no root FS</text>
+<rect class="box" x="20" y="220" width="860" height="60" rx="10"/>
+<text class="title" x="50" y="256">RAM</text>
+<rect class="ghost" x="110" y="226" width="150" height="48" rx="6"/>
+<rect class="ghost" x="380" y="226" width="260" height="48" rx="6"/>
+<text class="mono" x="185" y="300" text-anchor="middle">${fdt_addr_r}</text>
+<text class="mono" x="510" y="300" text-anchor="middle">${kernel_addr_r}</text>
+<path class="arrow" d="M720,162 C700,200 640,210 600,222" marker-end="url(#ah-bootz)" data-from="4" data-active="4"/>
+<g data-move="3:100,115"><rect class="soft" x="40" y="120" width="90" height="30" rx="4"/><text class="mono" x="85" y="140" text-anchor="middle">board.dtb</text></g>
+<g data-move="2:425,155"><rect class="soft" x="40" y="80" width="90" height="30" rx="4"/><text class="mono" x="85" y="100" text-anchor="middle">zImage</text></g>
+</svg>

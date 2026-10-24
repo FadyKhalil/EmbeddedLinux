@@ -1,0 +1,11 @@
+[Unit]
+Description=heartbeat demo daemon (Embedded Linux course)
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/heartbeat
+# systemd stops services with SIGTERM, which heartbeat handles cleanly
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

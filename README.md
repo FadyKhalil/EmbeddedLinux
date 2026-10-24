@@ -1,105 +1,58 @@
 # Embedded Linux From Scratch
 
-A hands-on course that builds a complete embedded Linux system **one piece at a time**:
-first by hand (toolchain → bootloader → kernel → root filesystem → init), then with the
-build systems used in industry (**Buildroot** and **Yocto**).
+A hands-on course that builds a complete embedded Linux system **one piece at a time**: first by hand
+(toolchain → bootloader → kernel → root filesystem → init), then with the build systems used in industry,
+**Buildroot** and **Yocto**. Every lesson works on **QEMU** (no hardware needed), a **Raspberry Pi** or a
+**BeagleBone Black**.
 
-Every lesson can be followed on **QEMU** (no hardware needed), a **Raspberry Pi**, or a **BeagleBone Black**.
+### 📖 [Read the course on the website](https://fadykhalil.github.io/EmbeddedLinux/)
 
-## The big picture
+The website has search, dark mode, copy buttons on every command, and **step-by-step animations** of how each
+piece works. Everything also reads fine right here on GitHub.
 
-Each lesson builds one box of this boot chain. By the end you will have made every one of them yourself.
+![Boot chain: ROM code, SPL, U-Boot, kernel and device tree, root filesystem, init, your application](docs/boot-chain.svg)
 
-```mermaid
-flowchart LR
-    A[Power on<br/>ROM code] --> B[U-Boot<br/>Lesson 3]
-    B -->|loads zImage + DTB| C[Linux kernel<br/>Lesson 4]
-    C -->|mounts| D[Root filesystem<br/>BusyBox - Lesson 5]
-    D -->|runs PID 1| E[Init process<br/>Lesson 6]
-    E --> F[Your application]
-    T[Cross toolchain<br/>Lesson 2] -.builds.-> B & C & D & F
+## Lessons
+
+| # | Lesson | You will build / learn |
+|---|---|---|
+| 1 | [Libraries](docs/01-libraries/README.md) | Static vs. shared libraries, what has to be on the target |
+| 2 | [Cross toolchain](docs/02-toolchain/README.md) | Your own ARM cross compiler with Crosstool-NG |
+| 3 | [U-Boot](docs/03-u-boot/README.md) | Bootloader, SD card layout, TFTP |
+| 4 | [Linux kernel](docs/04-kernel/README.md) | Configure, build and boot a kernel + device tree |
+| 5 | [Root filesystem](docs/05-rootfs/README.md) | A BusyBox rootfs over NFS, SD card and initramfs |
+| 6 | [Init process](docs/06-init/README.md) | Start the `heartbeat` daemon with BusyBox init, System V and systemd |
+| 7 | [Buildroot](docs/07-buildroot/README.md) | The whole system in one `make`, plus `heartbeat` as a package |
+| 8 | [Yocto Project](docs/08-yocto/README.md) | Layers, recipes, variables, tasks, `heartbeat` as a recipe |
+
+Extra: [Cross-compiling with CMake](docs/extras/cmake/06-cross-compiling.md).
+Start with the [course home page](docs/index.md) for board choice, host setup and conventions.
+
+## Repository layout
+
+```text
+docs/                  the course (Markdown + animated SVG diagrams)
+├── 01-libraries/ … 08-yocto/
+├── 06-init/app/       heartbeat: the demo daemon used in lessons 6-8
+├── 07-buildroot/br2-external/   Buildroot package for heartbeat
+├── scripts/           helper scripts (SD card, QEMU, toolchain environment)
+├── extras/cmake/      CMake, including a cross-compilation toolchain file
+└── contributing/      lesson template
+mkdocs.yml             website configuration (MkDocs Material)
 ```
 
-## Learning path
-
-Follow the lessons in order: each one uses what the previous one produced.
-
-| # | Lesson | You will build / learn | Output used later |
-|---|---|---|---|
-| 1 | [Libraries](1-Library/README.md) | Static vs. dynamic libraries, how linking works | Understanding of `.a` / `.so` on the target |
-| 2 | [Cross toolchain (Crosstool-NG)](2-Crosstool_Ng/README.md) | Your own ARM cross compiler | `~/x-tools/<tuple>/bin/*-gcc` |
-| 3 | [U-Boot](3-Uboot/README.md) | Bootloader, SD card layout, TFTP | `u-boot`, `sd.img` / SD card, TFTP server |
-| 4 | [Linux kernel](4-kernel/README.md) | Configure, build and boot a kernel + device tree | `zImage`, `*.dtb` |
-| 5 | [BusyBox root filesystem](5-Busybox/README.md) | A minimal rootfs over NFS, SD card and initramfs | `rootfs/` |
-| 6 | [Init process](6-InitProcess/README.md) | BusyBox init, System V init, systemd services | A daemon started at boot |
-| 7 | [Buildroot](7-BuildRoot/README.md) | The whole system built automatically, custom packages | `sdcard.img` |
-| 8 | [Yocto Project](8-Yocto/README.md) | Layers, recipes, variables, tasks | A custom image + your own layer |
-
-**Yocto sub-lessons** (in order):
-[Terminology](8-Yocto/1-YoctoTerminology/README.md) ·
-[What to edit](8-Yocto/1-YoctoTerminology/WhatToEdit.md) ·
-[Build folder & config files](8-Yocto/2-FolderDescription/README.md) ·
-[Layers](8-Yocto/3-Layer/README.md) ·
-[Basic variables](8-Yocto/4-Variables/Basic_Variables.md) ·
-[Variable assignment](8-Yocto/4-Variables/Variable_Assignment.md) ·
-[Your first recipe](8-Yocto/5-BuildRecipe/README.md) ·
-[Tasks](8-Yocto/6-TaskBuild/README.md) ·
-[BitBake cheat sheet](8-Yocto/bitbake/README.md)
-
-### Supporting topics
-
-Read these whenever you need them; they are not part of the main path.
-
-| Topic | Why it helps |
-|---|---|
-| [Vi editor](ViEditor/ViEditor.md) | Editing files on a target that has no other editor |
-| [Git & GitHub](Github/Github.md) | Working with U-Boot, kernel and Yocto sources |
-| [CMake](Cmake/01Overview.md) | Building applications (like the [init demo app](InitApp/)) for the target |
-
-## Choose your board
-
-You only need **one** of these. Each lesson has a section per board; skip the ones you don't use.
-
-| Board | What you need | Good for |
-|---|---|---|
-| **QEMU vexpress-a9** (Cortex-A9) | Only your PC | Starting out, no risk of breaking hardware |
-| **Raspberry Pi 3 / 4** | Pi, microSD card, USB-to-serial (3.3 V) cable | Real hardware, easy to find |
-| **BeagleBone Black** (Cortex-A8) | BBB, microSD card, USB-to-serial (3.3 V) cable | Real hardware, very well documented |
-
-> A serial console is essential on real hardware: U-Boot and the early kernel only talk over UART.
-
-## Host setup
-
-The lessons are written and tested for **Ubuntu 22.04 / 24.04** (a VM works). You need about
-**100 GB** of free disk if you plan to do the Yocto lesson.
+## Preview the website locally
 
 ```bash
-sudo apt update
-sudo apt install -y build-essential git bc bison flex libssl-dev libncurses-dev \
-    u-boot-tools qemu-system-arm device-tree-compiler \
-    tftpd-hpa nfs-kernel-server cpio rsync wget unzip
+pip install mkdocs-material==9.5.39 markdown-callouts==0.4.0
+mkdocs serve       # then open http://127.0.0.1:8000
 ```
 
-Lessons that need more packages (Crosstool-NG, Buildroot, Yocto) list them at the top.
-
-## Conventions used in every lesson
-
-| Name | Meaning | Example |
-|---|---|---|
-| `CROSS_COMPILE` | Prefix of your cross compiler | `arm-cortexa9_neon-linux-gnueabihf-` |
-| `ARCH` | Kernel / U-Boot architecture | `arm` (or `arm64` for 64-bit Pi) |
-| `DISK` | Block device of the SD card (or loop device) | `/dev/mmcblk0`, `/dev/sdb`, `/dev/loop0` |
-| Host IP | Your PC on the board network (TFTP / NFS server) | `192.168.0.1` |
-| Target IP | The board | `192.168.0.100` |
-
-- Commands run on your **host PC** unless the block starts with `# U-Boot prompt` or `# target shell`.
-- Anything in `<angle brackets>` must be replaced with your own value.
-- **Commands that erase disks are marked ⚠️.** Always double-check `DISK` with `lsblk` first.
-
-Helper scripts used across lessons live in [`scripts/`](scripts/).
+The site is published automatically to GitHub Pages on every push to `main`
+(see [`.github/workflows/docs.yml`](.github/workflows/docs.yml)).
 
 ## Contributing
 
-New lessons follow the [lesson template](LESSON_TEMPLATE.md) so every lesson has the same
-structure: goal → prerequisites → steps → checkpoint → troubleshooting → exercises.
-Found a broken command? Please open an issue or a pull request.
+New lessons follow the [lesson template](docs/contributing/lesson-template.md): goal → prerequisites → background
+(with an animation where it helps) → steps → checkpoint → troubleshooting → exercises. Found a broken command?
+Please open an issue or a pull request.

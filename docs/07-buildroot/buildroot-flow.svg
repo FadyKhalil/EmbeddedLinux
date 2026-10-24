@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="el-svg" viewBox="0 0 900 200" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<style>
+.el-svg:not(.el-inline){--el-fg:#1f2430;--el-muted:#5f6675;--el-box:#f4f5fb;--el-line:#9aa3b8;--el-accent:#ff5722;--el-accent-soft:#fff0e8;--el-primary:#3f51b5;--el-primary-soft:#e8eaf6;--el-ok:#2e7d32;--el-bad:#c62828}
+@media (prefers-color-scheme:dark){.el-svg:not(.el-inline){--el-fg:#e6e8ee;--el-muted:#9aa1b0;--el-box:#262a36;--el-line:#5c6478;--el-accent:#ff7043;--el-accent-soft:#4a2c20;--el-primary:#7986cb;--el-primary-soft:#2b3152;--el-ok:#66bb6a;--el-bad:#ef5350}}
+.el-svg .box{fill:var(--el-box);stroke:var(--el-line);stroke-width:1.5}
+.el-svg .soft{fill:var(--el-primary-soft);stroke:var(--el-primary);stroke-width:1.5}
+.el-svg .title{fill:var(--el-fg);font-size:14px;font-weight:600}
+.el-svg .sub{fill:var(--el-muted);font-size:12px}
+.el-svg .mono{fill:var(--el-fg);font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11.5px}
+.el-svg .arrow{stroke:var(--el-line);stroke-width:2;fill:none}
+.el-svg .ahead{fill:var(--el-line)}
+</style>
+<defs>
+<marker id="ah-br" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" class="ahead"/></marker>
+</defs>
+<text class="sub" x="535" y="40" text-anchor="middle">one command: make  →  every step below, in order</text>
+<g data-active="1"><rect class="soft" x="20" y="64" width="150" height="64" rx="10"/><text class="title" x="95" y="92" text-anchor="middle">defconfig</text><text class="sub" x="95" y="112" text-anchor="middle">+ make menuconfig</text></g>
+<line class="arrow" x1="172" y1="96" x2="196" y2="96" marker-end="url(#ah-br)"/>
+<g data-active="2"><rect class="box" x="200" y="64" width="96" height="64" rx="10"/><text class="title" x="248" y="92" text-anchor="middle">toolchain</text><text class="sub" x="248" y="112" text-anchor="middle">lesson 2</text></g>
+<line class="arrow" x1="297" y1="96" x2="313" y2="96" marker-end="url(#ah-br)"/>
+<g data-active="3"><rect class="box" x="315" y="64" width="96" height="64" rx="10"/><text class="title" x="363" y="92" text-anchor="middle">U-Boot</text><text class="sub" x="363" y="112" text-anchor="middle">lesson 3</text></g>
+<line class="arrow" x1="412" y1="96" x2="428" y2="96" marker-end="url(#ah-br)"/>
+<g data-active="4"><rect class="box" x="430" y="64" width="96" height="64" rx="10"/><text class="title" x="478" y="92" text-anchor="middle">kernel</text><text class="sub" x="478" y="112" text-anchor="middle">lesson 4</text></g>
+<line class="arrow" x1="527" y1="96" x2="543" y2="96" marker-end="url(#ah-br)"/>
+<g data-active="5"><rect class="box" x="545" y="64" width="96" height="64" rx="10"/><text class="title" x="593" y="92" text-anchor="middle">packages</text><text class="sub" x="593" y="112" text-anchor="middle">lessons 5, 6</text></g>
+<line class="arrow" x1="642" y1="96" x2="658" y2="96" marker-end="url(#ah-br)"/>
+<g data-active="6"><rect class="box" x="660" y="64" width="96" height="64" rx="10"/><text class="title" x="708" y="92" text-anchor="middle">rootfs</text><text class="sub" x="708" y="112" text-anchor="middle">image</text></g>
+<line class="arrow" x1="757" y1="96" x2="773" y2="96" marker-end="url(#ah-br)"/>
+<g data-active="7"><rect class="soft" x="775" y="64" width="96" height="64" rx="10"/><text class="title" x="823" y="92" text-anchor="middle">SD image</text><text class="sub" x="823" y="112" text-anchor="middle">ready to flash</text></g>
+<text class="mono" x="248" y="156" text-anchor="middle" data-from="2" data-active="2">output/host/</text>
+<text class="mono" x="363" y="156" text-anchor="middle" data-from="3" data-active="3">u-boot.img</text>
+<text class="mono" x="478" y="156" text-anchor="middle" data-from="4" data-active="4">zImage, *.dtb</text>
+<text class="mono" x="593" y="156" text-anchor="middle" data-from="5" data-active="5">output/target/</text>
+<text class="mono" x="708" y="156" text-anchor="middle" data-from="6" data-active="6">rootfs.ext2</text>
+<text class="mono" x="823" y="156" text-anchor="middle" data-from="7" data-active="7">sdcard.img</text>
+<text class="sub" x="535" y="186" text-anchor="middle">all outputs land in output/images/ (toolchain in output/host/)</text>
+</svg>

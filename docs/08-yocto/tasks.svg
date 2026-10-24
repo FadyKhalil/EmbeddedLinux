@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="el-svg" viewBox="0 0 880 215" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<style>
+.el-svg:not(.el-inline){--el-fg:#1f2430;--el-muted:#5f6675;--el-box:#f4f5fb;--el-line:#9aa3b8;--el-accent:#ff5722;--el-accent-soft:#fff0e8;--el-primary:#3f51b5;--el-primary-soft:#e8eaf6;--el-ok:#2e7d32;--el-bad:#c62828}
+@media (prefers-color-scheme:dark){.el-svg:not(.el-inline){--el-fg:#e6e8ee;--el-muted:#9aa1b0;--el-box:#262a36;--el-line:#5c6478;--el-accent:#ff7043;--el-accent-soft:#4a2c20;--el-primary:#7986cb;--el-primary-soft:#2b3152;--el-ok:#66bb6a;--el-bad:#ef5350}}
+.el-svg .box{fill:var(--el-box);stroke:var(--el-line);stroke-width:1.5}
+.el-svg .soft{fill:var(--el-primary-soft);stroke:var(--el-primary);stroke-width:1.5}
+.el-svg .title{fill:var(--el-fg);font-size:14px;font-weight:600}
+.el-svg .pre{fill:var(--el-muted);font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px}
+.el-svg .sub{fill:var(--el-muted);font-size:13px}
+.el-svg .mono{fill:var(--el-fg);font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+.el-svg .arrow{stroke:var(--el-line);stroke-width:2;fill:none}
+.el-svg .ahead{fill:var(--el-line)}
+.el-svg:not(.el-inline) .only-anim{display:none}
+</style>
+<defs>
+<marker id="ah-tasks" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" class="ahead"/></marker>
+</defs>
+<g data-active="1"><rect class="box" x="10" y="30" width="95" height="60" rx="10"/><text class="pre" x="57.5" y="52" text-anchor="middle">do_</text><text class="title" x="57.5" y="72" text-anchor="middle">fetch</text></g>
+<line class="arrow" x1="106" y1="60" x2="116" y2="60" marker-end="url(#ah-tasks)"/>
+<g data-active="2"><rect class="box" x="118" y="30" width="95" height="60" rx="10"/><text class="pre" x="165.5" y="52" text-anchor="middle">do_</text><text class="title" x="165.5" y="72" text-anchor="middle">unpack</text></g>
+<line class="arrow" x1="214" y1="60" x2="224" y2="60" marker-end="url(#ah-tasks)"/>
+<g data-active="3"><rect class="box" x="226" y="30" width="95" height="60" rx="10"/><text class="pre" x="273.5" y="52" text-anchor="middle">do_</text><text class="title" x="273.5" y="72" text-anchor="middle">patch</text></g>
+<line class="arrow" x1="322" y1="60" x2="332" y2="60" marker-end="url(#ah-tasks)"/>
+<g data-active="4"><rect class="box" x="334" y="30" width="95" height="60" rx="10"/><text class="pre" x="381.5" y="52" text-anchor="middle">do_</text><text class="title" x="381.5" y="72" text-anchor="middle">configure</text></g>
+<line class="arrow" x1="430" y1="60" x2="440" y2="60" marker-end="url(#ah-tasks)"/>
+<g data-active="5"><rect class="box" x="442" y="30" width="95" height="60" rx="10"/><text class="pre" x="489.5" y="52" text-anchor="middle">do_</text><text class="title" x="489.5" y="72" text-anchor="middle">compile</text></g>
+<line class="arrow" x1="538" y1="60" x2="548" y2="60" marker-end="url(#ah-tasks)"/>
+<g data-active="6"><rect class="box" x="550" y="30" width="95" height="60" rx="10"/><text class="pre" x="597.5" y="52" text-anchor="middle">do_</text><text class="title" x="597.5" y="72" text-anchor="middle">install</text></g>
+<line class="arrow" x1="646" y1="60" x2="656" y2="60" marker-end="url(#ah-tasks)"/>
+<g data-active="7"><rect class="box" x="658" y="30" width="95" height="60" rx="10"/><text class="pre" x="705.5" y="52" text-anchor="middle">do_</text><text class="title" x="705.5" y="72" text-anchor="middle">package</text></g>
+<line class="arrow" x1="754" y1="60" x2="764" y2="60" marker-end="url(#ah-tasks)"/>
+<g data-active="8"><rect class="soft" x="766" y="30" width="95" height="60" rx="10"/><text class="pre" x="813.5" y="52" text-anchor="middle">image</text><text class="title" x="813.5" y="72" text-anchor="middle">rootfs</text></g>
+<text class="mono" x="57.5" y="114" text-anchor="middle" data-active="1">DL_DIR</text>
+<text class="mono" x="165.5" y="114" text-anchor="middle" data-active="2">${S}</text>
+<text class="mono" x="273.5" y="114" text-anchor="middle" data-active="3">${S}</text>
+<text class="mono" x="381.5" y="114" text-anchor="middle" data-active="4">${B}</text>
+<text class="mono" x="489.5" y="114" text-anchor="middle" data-active="5">${B}</text>
+<text class="mono" x="597.5" y="114" text-anchor="middle" data-active="6">${D}</text>
+<text class="mono" x="705.5" y="114" text-anchor="middle" data-active="7">.ipk/.rpm</text>
+<text class="mono" x="813.5" y="114" text-anchor="middle" data-active="8">deploy/</text>
+<g class="only-anim" data-move="1:0,0 2:108,0 3:216,0 4:324,0 5:432,0 6:540,0 7:648,0 8:756,0"><rect class="soft" x="12" y="134" width="91" height="28" rx="14"/><text class="mono" x="57.5" y="153" text-anchor="middle">helloworld</text></g>
+<text class="sub" x="440" y="200" text-anchor="middle">Each task writes into a folder that the next task reads from. bitbake -c &lt;task&gt; stops after that task.</text>
+</svg>
