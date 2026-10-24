@@ -56,12 +56,12 @@ Above, `file(STRINGS file_name variable_name REGEX regex)` picks lines that matc
 
 ## Running a command at build time
 
-Build time commands are a bit trickier. The main complication comes from the target system; when do you want your command to run? Does it produce an output that another target needs? With this in mind, here is an example that calls a Python script to generate a header file:
+Build time commands are a bit trickier. The main complication comes from the target system; when do you want your command to run? Does it produce an output that another target needs? With this in mind, here is an example that converts the built ELF into a HEX file for flashing:
 
 ```cmake
 add_custom_target(flash ALL
     DEPENDS main.elf
-    COMMAND avr-objcopy -j .text -j .data -o ihex main.elf main.hex
+    COMMAND avr-objcopy -j .text -j .data -O ihex main.elf main.hex
     )
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/include/Generated.hpp DESTINATION include)

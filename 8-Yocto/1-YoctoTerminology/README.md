@@ -1,111 +1,118 @@
-# POKY
+# 8.1 - Yocto Terminology
 
-Poky is a reference distribution of Yocto Project. The word "reference" is used to mean "example" in this context.
+> Learn the vocabulary (Poky, metadata, OpenEmbedded, BitBake, BSP) that every other Yocto lesson uses.
 
-Yocto Project uses Poky to build images (kernel, system, and application software) for targeted hardware.
+| | |
+|---|---|
+| **Previous** | [8 - Yocto Project](../README.md) |
+| **Next** | [8.2 - What to edit: recipes, configs, classes, layers](WhatToEdit.md) |
 
-At the technical level it is a combined repository of the components
-	• Bitbake
-	• OpenEmbedded Core
-	• meta-yocto-bsp
-	• Documentation
+## How the pieces fit together
 
-Note: Poky does not contain binary files,it is a working example of how to build your own custom Linux distribution from source.
+```mermaid
+flowchart TB
+    subgraph Poky["Poky (reference distribution)"]
+        BB[BitBake<br/>task engine]
+        OE[meta<br/>OpenEmbedded-Core]
+        MP[meta-poky<br/>distro policy]
+        BSP[meta-yocto-bsp<br/>board support]
+    end
+    BB -->|reads| OE & MP & BSP
+    BB --> IMG[Images, packages, SDK]
+```
 
-What is difference between poky and Yocto
------------------------------------------
+## Poky
 
-The exact difference between Yocto and Poky is Yocto refers to the organization ( like one would refer to 'canonical', the company behind Ubuntu ), and Poky refers to the actual bits downloaded ( analogous to 'Ubuntu' )
+Poky is the **reference distribution** of the Yocto Project ("reference" meaning "working example").
+The Yocto Project uses Poky to build images (kernel, system and application software) for target hardware.
 
-# Metadata
+Technically, Poky is one repository that combines:
 
-**Non Yocto:**  A set of data that describes and gives information about other data
+- **BitBake**
+- **OpenEmbedded-Core** (the `meta` layer)
+- **meta-poky** and **meta-yocto-bsp**
+- Documentation
 
-**Yocto World:** 
-	Metadata refers to the build instructions, Commands and data used to indicate what versions of software are used Where they are obtained from Changes or additions to the software itself ( patches ) which are used to fix bugs or customize the software for use in a particular situation
+Poky contains **no binaries**: it is a working example of how to build your own Linux distribution from source.
 
-Metadata is collection of
+### Yocto vs. Poky
 
-- ​	Configuration files (.conf)
-- ​	Recipes (.bb and .bbappend)
-- ​	Classes (.bbclass)
-- ​	Includes (.inc)
+**Yocto** is the project / organisation (like Canonical, the company behind Ubuntu);
+**Poky** is the actual thing you download (like Ubuntu itself).
 
-# OpenEmbedded Project
+## Metadata
 
-From http://www.openembedded.org/wiki/Main_Page
+- **Outside Yocto:** data that describes other data.
+- **In Yocto:** the build instructions. Commands and data that say which software versions to use,
+  where to get them from, and which changes (**patches**) to apply to fix bugs or customise them.
 
-OpenEmbedded offers a best-in-class cross-compile environment. It allows developers to create a complete Linux Distribution for embedded systems.
+Metadata is a collection of:
 
-What is the difference between OpenEmbedded and the Yocto Project?
-------------------------------------------------------------------
+| File type | Extension |
+|---|---|
+| Configuration files | `.conf` |
+| Recipes | `.bb`, `.bbappend` |
+| Classes | `.bbclass` |
+| Includes | `.inc` |
 
-The Yocto Project and OpenEmbedded share a core collection of **metadata** called **openembedded-core.** 
+Each type is explained in [What to edit](WhatToEdit.md).
 
-However, the two organizations remain separate, each with its own focus
+## OpenEmbedded
 
-**OpenEmbedded** provides a comprehensive set of metadata for a wide variety of architectures, features, and applications
+[OpenEmbedded](https://www.openembedded.org) offers a cross-compile environment to create a complete Linux
+distribution for embedded systems.
 
-	Not a reference distribution
-	Designed to be the foundation for others
+### OpenEmbedded vs. the Yocto Project
 
-The **Yocto** Project focuses on providing powerful, easy-to-use, interoperable, well-tested tools, metadata, and board support packages (BSPs) for a core set of architectures and specific boards.
+Both share a core collection of metadata called **OpenEmbedded-Core (oe-core)**, but they remain separate
+organisations with different focus:
 
+| OpenEmbedded | Yocto Project |
+|---|---|
+| A broad set of metadata (e.g. `meta-openembedded`) for many architectures, features and applications | Easy-to-use, interoperable, well-tested tools, metadata and BSPs for a core set of architectures and boards |
+| Not a reference distribution; designed as a foundation for others | Provides the reference distribution, Poky |
 
-OpenEmbedded-Core(oe-core)
----------------------------
+## BitBake
 
-The Yocto Project and OpenEmbedded have agreed to work together and share a common core set of metadata(recipes, classes and associated files): oe-core
+- The core build engine of the Yocto Project, similar in role to **make**.
+- A **task scheduler** that parses mixed **Python** and **shell** code.
+- Reads recipes and turns them into **tasks** (fetch, unpack, patch, compile, install...), ordered by their dependencies.
+- Runs as many tasks in parallel as possible and tracks them all, so builds are fast and reproducible.
 
-# Bitbake
+Commands are in the [BitBake cheat sheet](../bitbake/README.md).
 
-- Bitbake is a core component of the Yocto Project.
+## meta-yocto-bsp
 
+A **Board Support Package (BSP)** is everything needed to support a particular **hardware device**, **set of
+devices** or **platform**: hardware features, kernel configuration, extra drivers, and any additional
+software components the board needs.
 
-- It basically performs the same functionality as of **make**.
+In the scarthgap release, `meta-yocto-bsp` supports these machines (see `meta-yocto-bsp/conf/machine/`):
 
+| Machine | `MACHINE` value |
+|---|---|
+| BeagleBone Black | `beaglebone-yocto` |
+| Generic 64-bit ARM (SystemReady) | `genericarm64` |
+| Generic x86 PCs (32 / 64-bit) | `genericx86` / `genericx86-64` |
 
-- It's a task scheduler that parses **python** and **shell** **script** mixed code
+For other hardware, add the vendor's BSP layer (e.g. `meta-raspberrypi`, `meta-ti`).
 
+## meta-poky
 
-- The code parsed generates and runs **tasks**, which are basically a set of steps ordered according to code's dependencies.
+Poky-specific metadata: the **distro configuration** (`DISTRO = "poky"`) that sets default policies such as
+the init system and package format.
 
+## Summary
 
-- It reads recipes and follows them by fetching packages, building them and incorporating the results into bootable images.
+**Poky includes:**
 
+- OpenEmbedded-Core (`meta`)
+- BitBake
+- Demo BSPs (`meta-yocto-bsp`)
+- Helper scripts to set up the environment (`oe-init-build-env`)
+- QEMU support to test images (`runqemu`)
 
-- It keeps track of all tasks being processed in order to ensure completion, maximizing the use of processing resources to reduce build time and being predictable.
+## Exercises
 
-# meta-yocto-bsp
-
-A Board Support Package (BSP) is a collection of information that defines how to support a particular **hardware device**, **set of devices**, or **hardware platform**
-
-The BSP includes information about the hardware features present on the device and kernel configuration information along with any additional hardware drivers required.
-
-The BSP also lists any additional software components required in addition to a generic Linux software stack for both essential and optional platform features.
-
-The meta-yocto-bsp layer in Poky maintains several BSPs such as the Beaglebone, EdgeRouter, and generic versions of both 32-bit and 64-bit IA machines.
-
-Machines supported
--------------------
-Texas Instruments BeagleBone (beaglebone)
-Freescale MPC8315E-RDB (mpc8315e-rdb)
-Intel x86-based PCs and devices (genericx86 and genericx86-64)
-Ubiquiti Networks EdgeRouter Lite (edgerouter)
-
-Note: To develop on different hardware, you will need to complement Poky with hardware-specific Yocto layers.
-
-# meta-poky
-
-meta-poky, which is Poky-specific metadata
-
-Documentation, which contains the Yocto Project source files used to make the set of user manuals.
-
-# Conclusion
-
-**Poky includes** 
-	some OE components(oe-core)
-	bitbake
-	demo-BSP's
-	helper scripts to setup environment
-	emulator QEMU to test the image
+1. In `poky/`, list the folders and match each one to a section of this page.
+2. Run `bitbake-layers show-layers` in your build folder and identify which layer is the BSP and which is the distro layer.

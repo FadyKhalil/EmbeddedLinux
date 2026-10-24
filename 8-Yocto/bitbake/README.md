@@ -1,72 +1,73 @@
-# Bitbake Cheat-sheet
+# BitBake Cheat Sheet
 
-This all commands that you need to know in bitbake
+> All the BitBake commands you need day to day, in one place.
 
-## Basic Commands
+| | |
+|---|---|
+| **Previous** | [8.8 - Tasks](../6-TaskBuild/README.md) |
+| **Back to** | [Course overview](../../README.md) |
 
-| Commands                                      | Descriptions                                                 |
-| --------------------------------------------- | ------------------------------------------------------------ |
-| bitbake -vDDD   <your-recipe>                 | Verbose                                                      |
-| bitbake -s                                    | List recipe add in the bblayer in conf file that will be executed |
-| bitbake -c listtasks   <recipe>               | List task will be excuted by the recipe                      |
-| bitbake -c   <your-task your-recipe>          | Run specific task of the recipe                              |
-| bitbake  <recipe>                             | Run all task in the recipe                                   |
-| bitbake -c cleanall  <recipe>                 | Delete the recipe from work directory                        |
-| bitbake -c devshell   <recipe>                | To trigger a shell inside the work directory if you wan to configure something manually |
-| bitbake -c cleansstate  <recipe>              | Clean the cashes of the recipe build                         |
-| bitbake -e  <recipe> \| grep  <variable-name> | if you want to see a specific variable value in your recipe  |
-| bitbake-getvar  <env-variable-bitbake>        | if you want to list an environment variable in bitbake such as `LDFLAGS` |
+## Basic commands
 
+| Command | Description |
+|---|---|
+| `bitbake <recipe>` | Run all tasks needed to build the recipe |
+| `bitbake -c <task> <recipe>` | Run a specific task of the recipe |
+| `bitbake -c listtasks <recipe>` | List the recipe's tasks |
+| `bitbake -s` | List all recipes available in the layers of `bblayers.conf`, with versions |
+| `bitbake -vDDD <recipe>` | Verbose output with maximum debug messages |
+| `bitbake -c cleanall <recipe>` | Delete the recipe's work directory, shared state and downloads |
+| `bitbake -c cleansstate <recipe>` | Delete the work directory and shared-state cache (keeps downloads) |
+| `bitbake -c devshell <recipe>` | Open a shell in the source folder with the build environment set |
+| `bitbake -e <recipe> \| grep ^<VAR>=` | Show a variable's final value in a recipe |
+| `bitbake-getvar -r <recipe> <VAR>` | Same, shorter, and also shows where the value came from |
 
+## `bitbake-layers` commands
 
-## Bitbake-layers command
+| Command | Description |
+|---|---|
+| `bitbake-layers show-layers` | Show the layers in the build and their priorities |
+| `bitbake-layers add-layer <path>` | Add a layer |
+| `bitbake-layers remove-layer <name>` | Remove a layer |
+| `bitbake-layers show-recipes <name>` | Show which layer provides a recipe |
+| `bitbake-layers create-layer <path>` | Create a new layer skeleton |
 
-| Commands                        | Description   |
-| ------------------------------- | ------------- |
-| bitbake-layers   <add-layer>    | Add new layer |
-| bitbake-layers   <remove-layer> | Remove layer  |
-| bitbake-layers   <show-layers>  | Show layers   |
-| bitbake-layers   <show-recipes> | show recipes  |
+## Adding files to the rootfs
 
-
-
-## Adding file into rootfs
+A recipe that fetches a git repository and installs two extra files from the recipe's `files/` folder:
 
 ```bash
-DESCRIPTION = "Install file into rootfs"
+DESCRIPTION = "Install files into rootfs"
 
-LICENSE = "MTI"
-LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/MTI-2.0;md5=0835ade698e0bcf8506ecda2f7b4f302"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 
-#to add extra directory to look at
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:" 
+# also look for files in files/ next to this recipe
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
-#take file from files directory
-SRC_URI += "git://github.com/ \
-file://file1 \
-file://file2 \
-"
+SRC_URI = "git://github.com/<user>/<repo>.git;protocol=https;branch=main \
+           file://file1 \
+           file://file2 \
+          "
+SRCREV = "<commit hash>"
 
-# Output of the fetch code
+# git sources are unpacked into WORKDIR/git
 S = "${WORKDIR}/git"
 
-
-do_install_append() {
-    #create custom dir into rootfs
-    install -d ${D}{bindir}
-    #copy files inside
-    install -m 0644 ${S}/file1 ${D}{bindir}
-    install -m 0644 ${S}/file2 ${D}{bindir}
+do_install:append() {
+    # create the destination folder in the rootfs
+    install -d ${D}${bindir}
+    # file:// sources are unpacked into WORKDIR, not S
+    install -m 0644 ${WORKDIR}/file1 ${D}${bindir}
+    install -m 0644 ${WORKDIR}/file2 ${D}${bindir}
 }
 ```
 
+## Increase the filesystem size of a `.wic` / SD card image
 
-
-# Increase Filesystem size of a .wic/.sdcard
-
-For example setting the RootFS to 2GB would require the following addition to the `local.conf` file:
+For example, a 2 GB rootfs (size in KiB), in `local.conf`:
 
 ```bash
-IMAGE_ROOTFS_SIZE = “2097152”
-IMAGE_OVERHEAD_FACTOR = “1.0”
+IMAGE_ROOTFS_SIZE = "2097152"
+IMAGE_OVERHEAD_FACTOR = "1.0"
 ```

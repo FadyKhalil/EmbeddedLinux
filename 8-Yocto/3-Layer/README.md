@@ -1,33 +1,73 @@
-# LAYERS
+# 8.4 - Layers
 
-In Yocto Project, a "layer" is a fundamental concept used to organize and manage the configuration, recipes, and other components needed to build an embedded Linux distribution. Layers provide a modular and flexible way to extend and customize the Yocto Project to meet the specific requirements of your embedded system.
+> Create your own layer, add it to the build, and understand layer priority.
 
-## Layer priority
+| | |
+|---|---|
+| **Previous** | [8.3 - Build folder & configuration files](../2-FolderDescription/README.md) |
+| **Next** | [8.5 - Basic variables](../4-Variables/Basic_Variables.md) |
 
-In the Yocto Project, "layer priority" refers to the order in which Yocto Project layers are evaluated and applied when building an image or recipe. Layer priority plays a crucial role in determining which recipes and configurations take precedence when there are overlapping or conflicting definitions in multiple layers. It ensures that the desired behavior and components are included in the final image or recipe.
+## Background
 
-## Build a layer
+A **layer** organises the configuration, recipes and other files needed to build a distribution. Layers make
+the Yocto Project modular: you extend or customise a build by **adding** layers instead of editing others.
 
-To create a layer we need to run the following command
+### Layer priority
 
-```sh
-# create a layer
-bitbake-layers create-layer <path/to/meta-layername>
+When two layers provide the same recipe, or both append to it, **layer priority** decides which one wins.
+Each layer sets its priority in `conf/layer.conf`:
+
+```bash
+# higher number = higher priority
+BBFILE_PRIORITY_meta-mylayer = "6"
 ```
 
-entering to the new layer added we will find conf file it has the configuration of the the layer
+`bitbake-layers show-layers` prints the priority of every layer in the build.
 
-we also will see example recipe we can run it by the following command
+## Steps
 
-```shell
-# run the example recipe
+### 1. Create a layer
+
+Run from your build directory (after `source poky/oe-init-build-env build`):
+
+```bash
+bitbake-layers create-layer ../meta-mylayer
+```
+
+This generates:
+
+```text
+meta-mylayer/
+├── conf/
+│   └── layer.conf              # layer name, priority, compatible releases
+├── COPYING.MIT
+├── README
+└── recipes-example/
+    └── example/
+        └── example_0.1.bb      # a sample recipe
+```
+
+Open `conf/layer.conf` and look at `BBFILE_PRIORITY_...` and `LAYERSERIES_COMPAT_...` (the releases this layer works with, e.g. `scarthgap`).
+
+### 2. Add the layer to the build
+
+```bash
+bitbake-layers add-layer ../meta-mylayer
+bitbake-layers show-layers
+```
+
+### 3. Build the example recipe
+
+```bash
 bitbake example
 ```
 
-To add the layer
+## Checkpoint
 
-```sh
-# Add the layer
-bitbake-layers add-layer <path/to/meta-layername>
-```
+`bitbake example` prints the recipe's message among the build log lines and ends with
+`... all succeeded.`
 
+## Exercises
+
+1. Change `BBFILE_PRIORITY_meta-mylayer` and check the result with `bitbake-layers show-layers`.
+2. Move on to [your first recipe](../5-BuildRecipe/README.md) and put it in this layer.

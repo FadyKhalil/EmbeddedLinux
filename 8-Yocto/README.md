@@ -1,195 +1,181 @@
-# Yocto
+# 8 - Yocto Project
 
-Yocto Project provides a flexible toolset and a development environment that allows embedded device developers across the world to collaborate through shared technologies, software stacks, configurations, and best practices used to create these tailored Linux images.
+> Build a custom Linux image with the Yocto Project for QEMU, Raspberry Pi or BeagleBone, then learn layers, recipes and variables step by step.
 
-To understand the outcome provided by the Yocto Project is set of instruction to give an output:
+| | |
+|---|---|
+| **Boards** | QEMU · Raspberry Pi 3 / 4 · BeagleBone Black |
+| **Time** | ~1 hour of work + 2-6 hours first build |
+| **Previous** | [7 - Buildroot](../7-BuildRoot/README.md) |
+| **Next** | [8.1 - Yocto terminology](1-YoctoTerminology/README.md) |
 
-Input: Set of data that describes what we want, that is our specification 
-	*(Kernel Configuration, Hardware Name, Packages/Binaries to be installed)*
+## What you will learn
 
-Output: Linux Based Embedded Product 
-		*(Linux Kernel, Root File System, Bootloader, Device Tree, Toolchain)*
+- What the Yocto Project and Poky are, and how they differ from Buildroot
+- How to prepare a build host and set up a build directory
+- How to build `core-image-minimal` for QEMU and real boards
+- How to add BSP layers and write the image to an SD card
 
-## Setting up Build Machine
+## Prerequisites
 
-1. 50 Gb of free disk
-2. Runs a supported linux distribution (example: Ubuntu, Fedora...)
-3. 	Git 1.8.3.1 or greater
-   	
-   	tar 1.27 or greater
-   	
-   	Python 3.4.0 or greater.
+- [Lesson 7](../7-BuildRoot/README.md) recommended (same ideas, simpler tool)
+- A supported Linux distribution (Ubuntu 22.04 / 24.04 work well)
+- **At least 90 GB** of free disk and 8 GB of RAM (more cores = much faster builds)
 
-## Setting Host Environment
+## Background
 
-Need to download the following essential tool to build yocto project
+The Yocto Project is a set of tools and metadata for creating **your own Linux distribution**.
+
+| You give it (input) | It gives you (output) |
+|---|---|
+| A specification: hardware (`MACHINE`), kernel configuration, packages to install, distro policy | Bootloader, Linux kernel, device tree, root filesystem, and an SDK / toolchain |
+
+Compared to Buildroot, Yocto is bigger and slower to learn, but builds **packages** (ipk/rpm/deb), scales
+to many products through **layers**, and is the standard in most companies.
+
+This lesson uses the **scarthgap** release (Yocto 5.0, long-term support until April 2028).
+Use the same branch name for **every** layer you clone. Check the
+[releases page](https://wiki.yoctoproject.org/wiki/Releases) for the current LTS.
+
+## Steps
+
+### 1. Install the host packages
 
 ```bash
-sudo apt-get install gawk wget git-core diffstat unzip texinfo gcc-multilib \
-build-essential chrpath socat cpio python python3 python3-pip python3-pexpect \
-xz-utils debianutils iputils-ping python3-git python3-jinja2 libegl1-mesa libsdl1.2-dev \
-pylint3 xterm
+sudo apt install build-essential chrpath cpio debianutils diffstat file gawk gcc git \
+    iputils-ping libacl1 liblz4-tool locales python3 python3-git python3-jinja2 \
+    python3-pexpect python3-pip python3-subunit socat texinfo unzip wget xz-utils zstd
+sudo locale-gen en_US.UTF-8
 ```
 
-## Download Yocto Project
-
-1.  Create a directory called `yocto` and change directory to it.
+### 2. Download Poky
 
 ```bash
-mkdir yocto && cd yocto
+mkdir -p ~/yocto && cd ~/yocto
+git clone -b scarthgap https://git.yoctoproject.org/poky
 ```
 
-2. Clone Poky reference and change directory to poky and checkout to stable release by poky dunfell branch
+### 3. Create a build directory
 
 ```bash
-# Clone the repo
-git clone -b dunfell git://git.yoctoproject.org/poky.git
-
-# Change directory
-cd poky
+cd ~/yocto
+source poky/oe-init-build-env build      # creates ~/yocto/build and cd's into it
 ```
 
-## Configuration Poky
+> Run this `source` command in **every new terminal** before using `bitbake`.
 
-We need to source the oe-init-build-env to set the environment for poky
+`build/conf/` now contains the two files you'll edit most:
+`local.conf` (what to build) and `bblayers.conf` (which layers to use).
+See [Folder description](2-FolderDescription/README.md) for every variable in them.
+
+### 4. (Optional) tune parallelism
+
+By default BitBake uses all your CPU cores. If your PC runs out of RAM during the build, limit it in
+`conf/local.conf`:
 
 ```bash
-source oe-init-build-env [Give folder name to be created]
+# number of BitBake tasks running at the same time
+BB_NUMBER_THREADS = "4"
+# number of parallel compile jobs inside each task (make -j)
+PARALLEL_MAKE = "-j 4"
 ```
 
-Edit the tune of the parallelism of bitbake generator for fast execution and generation of project.
+### 5. Build for your board
+
+#### QEMU
+
+The default `MACHINE` is already `qemux86-64`, so just build:
 
 ```bash
-# change directory to conf
-cd conf
-
-# edit the file local.conf
-vim local.com
+bitbake core-image-minimal
+runqemu qemux86-64 nographic      # log in as root, no password
 ```
 
-Then we need to add the two line in the file
+To emulate an ARM board instead, set `MACHINE = "qemuarm"` in `conf/local.conf`.
+
+#### Raspberry Pi
 
 ```bash
-##### Please replace number of cores with your host cores and multiply it by the number next to it #####
-BB_NUMBER_THREADS ?= "1.5 * Number of cores"
-PARALLEL_MAKE ?= "-j 2 * Number of cores"
+cd ~/yocto
+git clone -b scarthgap https://git.yoctoproject.org/meta-raspberrypi
+git clone -b scarthgap https://git.openembedded.org/meta-openembedded    # useful extra recipes
 
-#### EXAMPLE #####
-## my machine has 4 cores ##
-BB_NUMBER_THREADS ?= "6"
-PARALLEL_MAKE ?= "8"
-
-## NUMBER OF CORES MUST BE PAIR ##
+cd ~/yocto/build
+bitbake-layers add-layer ../meta-raspberrypi
+bitbake-layers show-layers
 ```
 
-### Qemu build
-
-Poky the default setting is to build qemu so we only need to run bitbake
+In `conf/local.conf`:
 
 ```bash
-# bitbake [options] [recipename/target ...]
+MACHINE = "raspberrypi4"         # raspberrypi3, raspberrypi4-64, ...
+ENABLE_UART = "1"                # serial console on the GPIO header
+```
+
+```bash
 bitbake core-image-minimal
 ```
 
-### Raspberry Pi
+#### BeagleBone Black
 
-We need to download the meta layer for raspberry pi
-
-Check the following link for other meta layer required [OpenEmbedded Link](https://layers.openembedded.org/layerindex/branch/master/layers/)
-
-Any meta data downloaded make sure to check out to **Dunfell branch**
+Poky's own `meta-yocto-bsp` layer already supports the BeagleBone, so no extra layer is needed.
+In `conf/local.conf`:
 
 ```bash
-# getting meta-raspberrypi
-git clone git://git.yoctoproject.org/meta-raspberrypi
-git checkout dunfell
-```
-
-We can also download of the layer that has many feature
-
-```bash
-git clone git://git.openembedded.org/meta-openembedded
-git checkout dunfell
-```
-
-We need to add the layer in **bblayer.conf**
-
-```bash
-# POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
-# changes incompatibly
-POKY_BBLAYERS_CONF_VERSION = "2"
-
-BBPATH = "${TOPDIR}"
-BBFILES ?= ""
-
-BBLAYERS ?= " \
-  /home/ahmed/Documents/linux_amit/Embedded_linux/Linux-yocto-Excersises/yocto/building_Raspberrypi_image/poky/meta \
-  /home/ahmed/Documents/linux_amit/Embedded_linux/Linux-yocto-Excersises/yocto/building_Raspberrypi_image/poky/meta-poky \
-  /home/ahmed/Documents/linux_amit/Embedded_linux/Linux-yocto-Excersises/yocto/building_Raspberrypi_image/poky/meta-yocto-bsp \
-  /home/ahmed/Documents/linux_amit/Embedded_linux/Linux-yocto-Excersises/yocto/building_Raspberrypi_image/meta-raspberrypi \
-  "
-```
-
-Change the machine in **local.conf** to the require raspberry pi chosen
-
-```bash
-...
-# This sets the default machine to be qemux86-64 if no other machine is selected:
 #MACHINE ??= "qemux86-64"
-MACHINE = "raspberrypi<x>"
-BB_NUMBER_THREADS = "6"
-PARALLEL_MAKE = "-j 8"
-...
-
+MACHINE = "beaglebone-yocto"
 ```
 
-**Build the image**
-
 ```bash
-# bitbake [options] [recipename/target ...]
 bitbake core-image-minimal
 ```
 
-### BeagleBone
+> For TI's full BSP (more drivers, TI kernel) you can use [meta-ti](https://git.yoctoproject.org/meta-ti) instead,
+> with `MACHINE = "beaglebone"`.
 
-Poky has the metadata bsp data layer for beaglebone we only need to change the support machine variable in **local.conf**
+### 6. Write the image to an SD card
 
-```bash
-# Comment the following line in local.conf
-#MACHINE ??= "qemux86"
-# Uncomment the following line
-MACHINE = "beaglebone"
-```
-
-Now we need to add the required layer for beaglebone
+Images are in `tmp/deploy/images/<machine>/`. Both boards produce a ready-to-flash **`.wic`** image:
 
 ```bash
-# clone meta ti for beaglebone
-git clone git://git.yoctoproject.org/meta-ti
+cd ~/yocto/build/tmp/deploy/images/<machine>/
+lsblk                                                     # find your SD card
+
+# ⚠️ Raspberry Pi (compressed .wic.bz2)
+bzcat core-image-minimal-raspberrypi4.rootfs.wic.bz2 | sudo dd of=/dev/mmcblk<x> bs=4M conv=fsync status=progress
+
+# ⚠️ BeagleBone Black (.wic)
+sudo dd if=core-image-minimal-beaglebone-yocto.rootfs.wic of=/dev/mmcblk<x> bs=4M conv=fsync status=progress
 ```
 
-We include the layer in **bblayer.conf**
+## Checkpoint
 
-```bash
-# POKY_BBLAYERS_CONF_VERSION is increased each time build/conf/bblayers.conf
-# changes incompatibly
-POKY_BBLAYERS_CONF_VERSION = "2"
+```text
+Poky (Yocto Project Reference Distro) 5.0.x raspberrypi4 /dev/ttyS0
 
-BBPATH = "${TOPDIR}"
-BBFILES ?= ""
-
-BBLAYERS ?= " \
-  /home/ahmed/yocto-training/yocto/layers/poky/meta \
-  /home/ahmed/yocto-training/yocto/layers/poky/meta-poky \
-  /home/ahmed/yocto-training/yocto/layers/poky/meta-yocto-bsp \
-  /home/ahmed/yocto-training/yocto/layers/meta-ti \
+raspberrypi4 login: root
+root@raspberrypi4:~#
 ```
 
-## Yocto Build SD Card
+## Troubleshooting
 
-Add in **local.conf**
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| `bitbake: command not found` | Environment not sourced in this terminal | `source poky/oe-init-build-env build` |
+| `Layer ... is not compatible with the core layer` | Layer on a different branch than poky | `git checkout scarthgap` in that layer |
+| `User namespaces are not usable by BitBake` (Ubuntu 24.04) | AppArmor restricts unprivileged user namespaces | Follow the Ubuntu 24.04 note in the [Yocto system requirements](https://docs.yoctoproject.org/ref-manual/system-requirements.html) |
+| Build killed / `Out of memory` | Too many parallel jobs for your RAM | Lower `BB_NUMBER_THREADS` and `PARALLEL_MAKE` (step 4) |
+| `No space left on device` | Not enough disk | Free space, or add `INHERIT += "rm_work"` to `local.conf` |
+| Fetch errors | Network / mirror | Re-run `bitbake`; finished tasks are cached |
 
-```bash
-IMAGE_FSTYPES +="[vendor]-sdimg"
-```
+## Exercises
 
+1. Add `strace` to the image: `IMAGE_INSTALL:append = " strace"` in `local.conf` (note the leading space), rebuild, and run `strace ls` on the target.
+2. Build `core-image-base` and compare the image size with `core-image-minimal`.
+3. Run `bitbake -e core-image-minimal | grep ^MACHINE=` and check it matches what you set.
+
+## Recap
+
+- You built and booted a Yocto image and added a BSP layer.
+- The sub-lessons explain what you just did: start with [terminology](1-YoctoTerminology/README.md),
+  then [layers](3-Layer/README.md), [variables](4-Variables/Basic_Variables.md) and [your first recipe](5-BuildRecipe/README.md).

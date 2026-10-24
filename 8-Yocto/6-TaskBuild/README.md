@@ -1,87 +1,97 @@
-# Task Build
+# 8.8 - Tasks
 
-To build a recipe we need to run some tasks
+> See the tasks BitBake runs for a recipe, run them one at a time, and inspect what each produces.
 
-To list task inside a recipe we need to run
+| | |
+|---|---|
+| **Previous** | [8.7 - Your first recipe](../5-BuildRecipe/README.md) |
+| **Next** | [BitBake cheat sheet](../bitbake/README.md) |
 
-```sh
-bitbake -c listtasks <recipe-name>	
+## Background
+
+To build a recipe, BitBake runs a chain of **tasks**, each one using the output of the previous one:
+
+```mermaid
+flowchart LR
+    F[do_fetch] --> U[do_unpack] --> P[do_patch] --> C[do_configure] --> CO[do_compile] --> I[do_install] --> PK[do_package] --> R[...image]
 ```
 
-To clean the recipe 
+| Task | Description |
+|---|---|
+| `do_fetch` | Fetches the source code (from `SRC_URI`) into `DL_DIR` |
+| `do_unpack` | Unpacks the source code into the work directory |
+| `do_patch` | Finds patch files and applies them to the source |
+| `do_configure` | Configures the source: enables/disables build-time options |
+| `do_compile` | Compiles the source in the build directory `B` |
+| `do_install` | Copies the build results into the staging area `D` |
 
-```
-bitbake -c cleanall <recipe-name>
-```
-
-The output of the task is list in alphabetics order.
-
-The most common tasks are:
-
-| Tasks                        | Description                                                  |
-| ---------------------------- | ------------------------------------------------------------ |
-| Fetch **(do_fetch)**         | Fetches the source code                                      |
-| Unpack **(do_unpack)**       | unpacks the source code into a working directory             |
-| Patch **(do_patch)**         | Locates patch files and applies them to the source code      |
-| configure **(do_configure)** | Configures the source by enabling and disabling any build-time and configuration options for the software being built |
-| Compile **(do_compile)**     | Compiles the source in the compilation directory             |
-| Install **(do_install)**     | Copies files from the compilation directory to a holding area |
-
-
-
-## Fetch Task
-
-Fetch task it fetches the package source from the local or remote repository.
-
-To fetch a package source you need to add the source in **SRC_URI** variable in the recipe.
-
-**SRCREV** describe if you want to fetch specific revision (Commit hash)
-
-to excute only the fetch task
+## Useful commands
 
 ```bash
-bitbake -c do_fetch <recipe_name>
+# list every task of a recipe (printed in alphabetical order)
+bitbake -c listtasks <recipe_name>
+
+# run one task (and everything it depends on)
+bitbake -c <task> <recipe_name>         # e.g. bitbake -c compile helloworld
+
+# delete everything built and downloaded for a recipe
+bitbake -c cleanall <recipe_name>
 ```
 
-the output will be shown in download folder which is described in local.conf file.
+## Steps
 
+### 1. Fetch
 
-
-## Unpack Task
-
-Unpack task unpacks the package that has been downloaded with Fetch task.
-
-the unpacking is stored in Working directory of the recipe, to show it
-
-```shell
-bitbake -e <recipe_name> | grep ^WORKDIR
-```
-
-in order to see the unpack what is does, first we set the variable **S** to the work directory of the recipe then run the following bitbake command
+The fetch task downloads the source from local or remote locations listed in **`SRC_URI`**.
+**`SRCREV`** selects a specific revision (commit hash) when fetching from git.
 
 ```bash
-bitbake -c do_unpack <recipe_name>
+bitbake -c fetch <recipe_name>
 ```
 
-the output will be show in work directory folder.
+The result is in the download folder (`DL_DIR`, set in `local.conf`).
 
+### 2. Unpack
 
-
-## Patch Task
-
-Patch task locates the patch files and applies the patches to the sources if any patch is available.
-
-This is optional task, executes if patch is available.
-
-A patch files provides some explicit changes for a specific file. That can be applied to that file.
-
-It can be defined in **SRC_URI** variable after the fetch or we can use **SRC_URI:append = <patch_file>**
-
-to run the patch task
+Unpacks what `do_fetch` downloaded into the recipe's work directory. To find it:
 
 ```bash
-bitbake -c do_patch <recipe_name>
+bitbake-getvar -r <recipe_name> WORKDIR
 ```
 
+```bash
+bitbake -c unpack <recipe_name>
+```
 
+Look inside `WORKDIR` (and `S`) to see the unpacked source.
 
+### 3. Patch
+
+Locates patch files and applies them to the source. It's optional and only does something if the recipe
+lists patches. A patch describes explicit changes to one or more files.
+
+Add patches to `SRC_URI`, usually from a `.bbappend` in your own layer:
+
+```bash
+SRC_URI += "file://0001-fix-something.patch"
+```
+
+```bash
+bitbake -c patch <recipe_name>
+```
+
+### 4. Configure, compile, install
+
+```bash
+bitbake -c configure <recipe_name>
+bitbake -c compile <recipe_name>
+bitbake -c install <recipe_name>      # results under ${WORKDIR}/image (= D)
+```
+
+If a task fails, its log is in `${WORKDIR}/temp/log.do_<task>`, and the exact script BitBake ran is in
+`${WORKDIR}/temp/run.do_<task>`.
+
+## Exercises
+
+1. Run `bitbake -c install helloworld` and find the binary under `image/usr/bin/` in the work directory.
+2. Break `helloworld.c` on purpose, run `bitbake helloworld`, and read `temp/log.do_compile`.

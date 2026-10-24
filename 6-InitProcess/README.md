@@ -1,170 +1,201 @@
-# Init Process
+# 6 - Init Process
 
-The **init process** is the first process that is started by the kernel during the boot process. The init process has a process ID (PID) of 1 and is responsible for starting and managing all other processes on the system.
+> Start your own daemon at boot (and stop it at shutdown) with BusyBox init, System V init and systemd.
 
-```bash
-# To show the process tree
-pstree -gn 
-```
+| | |
+|---|---|
+| **Boards** | QEMU (vexpress-a9) · Raspberry Pi 3 / 4 · BeagleBone Black |
+| **Time** | ~1.5 hours |
+| **Previous** | [5 - BusyBox root filesystem](../5-Busybox/README.md) |
+| **Next** | [7 - Buildroot](../7-BuildRoot/README.md) |
 
-In the following execices we will boot every time from NFS server, make sure to put all the folders for the root file system in
+## What you will learn
 
-`/etc/exports`
+- What PID 1 does and how the three common init systems differ
+- How to add start / stop scripts to BusyBox init via `inittab`
+- How System V init scripts and runlevels work
+- How to write, enable and debug a systemd service
 
-then run `sudo exportfs -r` to update the nfs protocol with new folder added.
+## Prerequisites
 
-## Create the APP
+- [Lesson 5](../5-Busybox/README.md) done, booting the rootfs over **NFS** (Option A)
+- `cmake` on the host (`sudo apt install cmake`)
+- For Part B and Part C you need an image that contains System V init or systemd. The easiest way is
+  Buildroot from [lesson 7](../7-BuildRoot/README.md) (*System configuration → Init system*), so you can come
+  back to these parts after lesson 7.
 
-1. Create a **simple application** just to see it running in initialization.
+## Background
 
-2. Compile the App with **specific compiler for the board**
-
-   You can see the Folder **InitApp** in the Repo.
-
-## BusyBox Init
-
-The **busybox init** process then reads the system configuration files and starts various system services, such as network interfaces, device drivers, and daemons, to bring the system to a functional state.
-
-### Create Rootfs
-
-Using buildroot Or Busybox we set the configuration in filesystem to be **busybox init**
-
-then we edit the **bootargs** in uboot to boot on the busybox init filesystem
+The **init process** is the first user-space process the kernel starts. It has **PID 1**, starts every other
+service, adopts orphaned processes and handles shutdown.
 
 ```bash
-setenv bootargs_busybox "setenv bootargs console=ttyS0,115200 root=/dev/nfs ip=192.168.7.100:::::eth0 nfsroot=192.168.7.1:/home/fady/rfs_bb,nfsvers=3,tcp rw init=/sbin/init"
+# target shell: show the process tree with PIDs
+pstree -p
 ```
 
-then define bootcmd variable for busybox init
+| | BusyBox init | System V init | systemd |
+|---|---|---|---|
+| Config | `/etc/inittab` | `/etc/inittab` + `/etc/init.d/` scripts | Unit files in `/etc/systemd/system/` |
+| Runlevels / targets | No | Runlevels 0-6 | Targets (`multi-user.target`...) |
+| Size | Tiny | Small | Large |
+| Typical use | Minimal systems | Classic embedded, older distros | Feature-rich devices |
+
+The same rootfs is reused for every part: you boot it over NFS, so files you add on the host appear on the target immediately.
+
+### Make NFS boot automatic
+
+Save the boot commands in U-Boot once so every reboot boots the NFS rootfs (single quotes keep
+`${...}` from being expanded too early):
 
 ```bash
-setenv bootcmd_busybox 'run bootargs_busybox; tftp 0x80200000 zImage; tftp 0x82000000 am335x-boneblack.dtb; bootz 0x80200000 - 0x82000000'
+# U-Boot prompt (use your board's console and dtb)
+setenv bootargs_nfs 'setenv bootargs console=ttyAMA0 root=/dev/nfs ip=192.168.0.100:::::eth0 nfsroot=192.168.0.1:/home/<you>/rootfs,nfsvers=3,tcp rw init=/sbin/init'
+setenv bootcmd_nfs 'run bootargs_nfs; tftp ${kernel_addr_r} zImage; tftp ${fdt_addr_r} <your-board>.dtb; bootz ${kernel_addr_r} - ${fdt_addr_r}'
+setenv bootcmd 'run bootcmd_nfs'
+saveenv
 ```
 
-### Add the application
+## Steps
 
-We need to add the application into the init script so it run at startup.
+### 1. Build the demo application
 
-We need to modify two script:
+[`InitApp/deamonapp.c`](../InitApp/deamonapp.c) is a tiny daemon that prints a message every 4 seconds.
+Cross-compile it **statically** so it doesn't need any library on the target:
 
-- `/etc/init.d/rcS1`
+```bash
+cd <path-to-this-repo>/InitApp
+cmake -B build -DCMAKE_C_COMPILER=${CROSS_COMPILE}gcc
+cmake --build build
 
-  ```bash
-  echo "rsc1 is on"
-  deamonapp &
-  ```
+file build/deamonapp        # must say ARM, statically linked
+sudo cp build/deamonapp $HOME/rootfs/bin/
+```
 
-- `/etc/init.d/rcK1`
+### Part A - BusyBox init
 
-  ```bash
-  echo "shutdown deamon app"
-  pkill -e deamonapp
-  sleep 3
-  ```
+#### 2. Write a start and a stop script
 
-- Adding the script in inittab
-
-  ```bash
-  # mount proc and sys file system
-  null::sysinit:/bin/mount -t proc proc /proc
-  null::sysinit:/bin/mount -t sysfs sysfs /sys
-  
-  # Excute when the system start
-  ::sysinit:/etc/init.d/rcS1
-  
-  # ask to enter to the shell
-  console::adkfirst:-/bin/sh
-  
-  # Excute when the system will go down
-  ::shutdown:/etc/init.d/rcK1
-  ```
-
-
-## SystemV init
-
-The **BusyBox init** daemon just described is just a trimmed down version of System V init. Compared to the BusyBox init, System V init has two advantages:
-
-- The boot scripts are written in a well-known formal make it easier to add more packages or bin to run at boot time. 
-- It has the concept of runlevels.
-
-### Setup
-
-`/etc/init.d/deamonapp`
-
-take in count that **deamonapp** is a script inside the init.d
+`$HOME/rootfs/etc/init.d/rcS1`, run at boot:
 
 ```sh
-#! /bin/sh
+#!/bin/sh
+echo "rcS1 is on"
+deamonapp &
+```
+
+`$HOME/rootfs/etc/init.d/rcK1`, run at shutdown:
+
+```sh
+#!/bin/sh
+echo "shutdown deamon app"
+pkill -e deamonapp
+sleep 3
+```
+
+```bash
+sudo chmod +x $HOME/rootfs/etc/init.d/rcS1 $HOME/rootfs/etc/init.d/rcK1
+```
+
+#### 3. Call them from `inittab`
+
+Replace `$HOME/rootfs/etc/inittab` with:
+
+```bash
+# mount proc and sys file systems
+null::sysinit:/bin/mount -t proc proc /proc
+null::sysinit:/bin/mount -t sysfs sysfs /sys
+
+# execute when the system starts
+::sysinit:/etc/init.d/rcS1
+
+# ask the user to press Enter, then start a shell
+::askfirst:-/bin/sh
+
+# execute when the system goes down
+::shutdown:/etc/init.d/rcK1
+```
+
+Reboot the board. You should see `rcS1 is on` and then the daemon's message every 4 seconds.
+Type `reboot` (or `poweroff`) on the target to see `rcK1` stop it.
+
+### Part B - System V init
+
+System V init is the classic init that BusyBox init is a trimmed-down copy of. It adds two things:
+**standard start/stop scripts** that are easy to add packages to, and **runlevels**.
+
+#### 4. Write an init script
+
+`/etc/init.d/deamonapp`:
+
+```sh
+#!/bin/sh
 case "$1" in
-      start)
-           echo "Starting deamonapp........."
-           start-stop-daemon -S -n deamonapp -a /bin/deamonapp &
-           ;;
-     stop)
-           echo "Stopping deamonapp........."
-           start-stop-daemon -K -n deamonapp
-           ;;
-     *)
-           echo "Usage: $0 {start|stop}"
-           exit 1
+    start)
+        echo "Starting deamonapp........."
+        start-stop-daemon -S -b -n deamonapp -a /bin/deamonapp
+        ;;
+    stop)
+        echo "Stopping deamonapp........."
+        start-stop-daemon -K -n deamonapp
+        ;;
+    *)
+        echo "Usage: $0 {start|stop}"
+        exit 1
 esac
 exit 0
 ```
 
-**start-stop-daemon** is a helper function that makes it easier to manipulate background processes such as this. It originally came from the Debian installer package, dpkg, but most embedded systems use the one from BusyBox. It starts the daemon with the -S parameter, making sure that there is never more than one instance running at any one time. To stop a daemon, you use the -K parameter, which causes it to send a signal, SIGTERM by default, to indicate to the daemon that it is time to terminate.
-
-### Usage of the app
-
-- Ask for Help
-
-```sh
-/etc/init.d/deamonapp --help
+```bash
+chmod +x /etc/init.d/deamonapp
 ```
 
-- stop service
+`start-stop-daemon` makes background services easy to manage: `-S` starts the program (and makes sure only
+one instance runs), `-b` puts it in the background, and `-K` stops it by sending `SIGTERM`.
 
-```sh
-/etc/init.d/deamonapp stop
-```
-
-- start service
-
-```sh
-/etc/init.d/deamonapp start
-```
-
-- Then add this script to one of the `/etc/rc<x>.d/` folders to specify on what run level we will start the application
-
-  ```sh
-  # from file system root we create a symbolic link to our application and place it in one of the rc<runlevel> folders(runlevel)
-  ln -s ../init.d/deamonapp ./etc/rc5.d/S40deamonapp.sh
-  # this simplic link file is named `S40`, S -> will call our script with `start` as argument, `40` order of execution
-  ```
-
-- To kill the application at when getting in specific runlevel we create similar symbolic link
-
-  ```sh
-  # Kill the process in runlevel 5
-  ln -s ../init.d/deamonapp ./etc/rc5.d/K40deamonapp.sh
-  # Kill the process in runlevel 4
-  ln -s ../init.d/deamonapp ./etc/rc4.d/K40deamonapp.sh
-  ```
-
-  to kill the application we execute
-  
-  ```sh
-  telinit 4 # switching to runlevel 4 will kill the application
-  ```
-
-
-
-## System D
-
-- we need to create in systemd filesystem `./etc/systemd/system/deamonapp.service`
+#### 5. Try it by hand
 
 ```bash
+# target shell
+/etc/init.d/deamonapp            # prints the usage line
+/etc/init.d/deamonapp start
+ps | grep deamonapp              # running
+/etc/init.d/deamonapp stop
+ps | grep deamonapp              # gone
+```
+
+#### 6. Start it automatically for a runlevel
+
+On images with runlevel folders (`/etc/rc<N>.d/`, e.g. Yocto's sysvinit), add symbolic links:
+
+```bash
+# target shell, from the rootfs root
+# S = call the script with "start"; 40 = order (lower runs first)
+ln -s ../init.d/deamonapp ./etc/rc5.d/S40deamonapp
+
+# K = call it with "stop" when entering runlevel 4
+ln -s ../init.d/deamonapp ./etc/rc4.d/K40deamonapp
+```
+
+```bash
+# target shell
+telinit 4        # switch to runlevel 4: the daemon is stopped
+telinit 5        # back to runlevel 5: it starts again
+```
+
+> **Buildroot's System V init** has no `rc<N>.d` folders: its `/etc/init.d/rcS` simply runs every
+> `/etc/init.d/S??*` script in order. Name your script `/etc/init.d/S40deamonapp` there instead.
+
+### Part C - systemd
+
+#### 7. Write a service unit
+
+`/etc/systemd/system/deamonapp.service`:
+
+```ini
 [Unit]
-Description=app server
+Description=Demo daemon from the Embedded Linux course
+
 [Service]
 Type=simple
 ExecStart=/bin/deamonapp
@@ -173,55 +204,69 @@ ExecStart=/bin/deamonapp
 WantedBy=multi-user.target
 ```
 
-
-
-then you can start and stop it using
+#### 8. Control and inspect it
 
 ```bash
-# start readapp program
+# target shell
+systemctl daemon-reload            # make systemd read the new file
 systemctl start deamonapp
-```
+systemctl status deamonapp         # active (running)
+ps | grep deamonapp                # the process is there
 
-but if you execute `ps ` command on terminal it will show that the application is running
-
-```bash
-# stop readapp program
 systemctl stop deamonapp
-```
+ps | grep deamonapp                # the process is gone
 
-but if you execute `ps ` command on terminal it will show that the application is **not** there
-
-using
-
-```bash
-systemctl status deamonapp
-```
-
-to see the full log of our application we
-
-```bash
+# logs (the daemon's output goes to the journal)
 journalctl -u deamonapp.service
-#or for current boot only
-journalctl -u deamonapp.service -b 
+journalctl -u deamonapp.service -b # current boot only
 ```
 
+#### 9. Start it at every boot
 
-
-To make it **persistent**, **permanent** (application will boot for multiuser.target by default) we execute -------> **[Install]** section purpose
+The `[Install]` section is what makes this possible:
 
 ```bash
+# target shell
 systemctl enable deamonapp
-```
-
-
-
-```bash
 reboot
-ps # not application is there Executing 
+# after reboot:
+ps | grep deamonapp                # running without starting it by hand
 ```
 
-**Note:**
+`enable` creates a link in `/etc/systemd/system/multi-user.target.wants/`. A target's `.wants` folder works
+exactly like listing the service under `Wants=` in the target itself, so services can add themselves to a
+target without editing it.
 
-Now, you can see how services add dependencies without having to keep on editing target unit files. A target can have a directory named **<target_name>.target.wants**, which can contain links to services.
+## Checkpoint
 
-This is exactly the same as adding the dependent unit to the **[Wants]** list in the target.
+```text
+rcS1 is on
+
+ Deamon is up and running
+
+Please press Enter to activate this console.
+```
+
+The message keeps repeating every 4 seconds, and stops after `rcK1` runs at shutdown.
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| `can't run '/etc/init.d/rcS1': Permission denied` | Script not executable | `sudo chmod +x` it on the host |
+| `deamonapp: not found` | Binary missing or built for x86 | `file $HOME/rootfs/bin/deamonapp` must say ARM |
+| `deamonapp: not found` although the file exists | Built dynamically, libraries missing | Rebuild; the CMake file links with `-static` |
+| `telinit: not found` / no `rc5.d` | Running BusyBox init, not System V | Use a Buildroot / Yocto image with System V init |
+| `systemctl: not found` | Image doesn't use systemd | Rebuild Buildroot with *Init system = systemd* |
+| Service fails, `status=203/EXEC` | `ExecStart` path wrong or not executable | Check the path and `chmod +x` |
+
+## Exercises
+
+1. Change `deamonapp.c` to write to `/tmp/deamon.log` instead of the console, rebuild, and check the file.
+2. Add `Restart=always` to the systemd unit, then `kill` the process and watch systemd restart it.
+3. Make the System V script support `restart` and `status`.
+
+## Recap
+
+- PID 1 decides what runs at boot; you started your own daemon with three different init systems.
+- Doing all of this by hand is a lot of work. Next, **Buildroot** builds the toolchain, bootloader, kernel and rootfs for you.

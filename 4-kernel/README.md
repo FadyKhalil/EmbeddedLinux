@@ -1,214 +1,202 @@
-# Linux Kernel
+# 4 - Linux Kernel
 
-The Linux kernel is the core component of the Linux operating system, responsible for managing system resources such as memory, processes, input/output (I/O), and device drivers. It is an open-source software project that was initially developed by Linus Torvalds in 1991 and is now maintained by a large community of developers around the world.
+> Configure and cross-compile the Linux kernel and its device tree, then boot it from U-Boot over TFTP.
 
-## Download Linux Kernel
+| | |
+|---|---|
+| **Boards** | QEMU (vexpress-a9) · Raspberry Pi 3 / 4 · BeagleBone Black |
+| **Time** | ~30 min of work + 15-60 min build |
+| **Previous** | [3 - U-Boot](../3-Uboot/README.md) |
+| **Next** | [5 - BusyBox root filesystem](../5-Busybox/README.md) |
 
-### Vexpress (Qemu)
+## What you will learn
+
+- Where to get the right kernel source for your board
+- How to start from a `defconfig` and customise it with `menuconfig`
+- How to build the kernel image, modules and device trees
+- How U-Boot hands the kernel and device tree over with `bootz`
+- Why the kernel **panics** at the end of this lesson, and what it needs next
+
+## Prerequisites
+
+- [Lesson 3](../3-Uboot/README.md) done: U-Boot runs, TFTP works, `ipaddr` / `serverip` saved
+- `CROSS_COMPILE` and `ARCH` exported (lesson 2)
+- Host packages: `bc bison flex libssl-dev libncurses-dev` (see [main README](../README.md#host-setup))
+
+## Background
+
+The **Linux kernel** manages memory, processes, I/O and device drivers. To boot it, U-Boot needs two files
+in RAM:
+
+| File | What it is |
+|---|---|
+| `zImage` (32-bit) / `Image` (64-bit) | The compressed kernel itself |
+| `*.dtb` | The **device tree blob**: describes the board's hardware (RAM, UARTs, Ethernet...) so one kernel can run on many boards |
+
+U-Boot also passes the kernel a command line, the `bootargs` variable, which tells it for example which
+serial port is the console (`console=`) and where the root filesystem is (`root=`).
+
+## Steps
+
+### 1. Get the kernel source
+
+#### QEMU (vexpress)
 
 ```bash
-git clone --depth=1 git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
+# mainline stable kernel, 6.6 long-term branch
+git clone --depth=1 -b linux-6.6.y https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
 cd linux
-
-#configure the kernel to vexpress
-make ARCH=arm vexpress_defconfig
-
-# To indentify your kernel version 
-make ARCH=arm kernelversion
+make kernelversion
 ```
 
-### Raspberry Pi
+#### Raspberry Pi
 
 ```bash
+# the Raspberry Pi fork contains the Pi-specific drivers
 git clone --depth=1 https://github.com/raspberrypi/linux
 cd linux
-
-#configure the kernel to rpi depends on the SoC number
-make bcmXXXX_defconfig
 ```
 
-### BeagleBone
+#### BeagleBone Black
 
 ```bash
 git clone --depth=1 https://github.com/beagleboard/linux.git
 cd linux
-
-#configure the kernel to beaglebone
-make bb.org_defconfig
 ```
 
-## Configure Kernel
+### 2. Load the default configuration
 
-For all the next board this configuration must be checked
-
-- [ ] Enable **devtmpfs**
-- [ ] Change kernel compression to **XZ**
-- [ ] Change your kernel local version to your name and append on it <youName>-v1.0
-
-### Vexpress (Qemu)
+| Board | 32-bit (`ARCH=arm`) | 64-bit (`ARCH=arm64`) |
+|---|---|---|
+| QEMU vexpress-a9 | `make vexpress_defconfig` | - |
+| Raspberry Pi 3 | `make bcm2709_defconfig` | `make bcmrpi3_defconfig` |
+| Raspberry Pi 4 | `make bcm2711_defconfig` | `make bcm2711_defconfig` |
+| BeagleBone Black | `make bb.org_defconfig` | - |
 
 ```bash
-#export the compiler
-export CROSS_COMPILE=PathToCompiler/arm-linux-cortexa9Compiler
-#export the architecture used
+# example: QEMU
 export ARCH=arm
+export CROSS_COMPILE=arm-cortexa9_neon-linux-gnueabihf-
+make vexpress_defconfig
+```
 
-#configure the kernel with the configuration discuss above
+Use the same `CROSS_COMPILE` you used for U-Boot on that board.
+
+### 3. Customise the configuration
+
+```bash
 make menuconfig
-
-#build the kernel
-make -j4 zImage modules dtbs
 ```
 
-### Raspberry PI
+Apply these requirements on every board:
+
+| Requirement | Where in menuconfig | Symbol |
+|---|---|---|
+| Enable **devtmpfs** (kernel creates `/dev` nodes) | Device Drivers → Generic Driver Options | `DEVTMPFS=y`, `DEVTMPFS_MOUNT=y` |
+| Compress the kernel with **XZ** | General setup → Kernel compression mode | `KERNEL_XZ=y` |
+| Set the local version to `-<yourName>-v1.0` | General setup → Local version | `LOCALVERSION="-<yourName>-v1.0"` |
+
+### 4. Build
 
 ```bash
-#export the compiler
-export CROSS_COMPILE=arm-linux-gnueabihf-
-#export the architecture used
-export ARCH=arm
+# 32-bit boards
+make -j$(nproc) zImage modules dtbs
 
-#configure the kernel with the configuration discuss above
-make menuconfig
-
-#build the kernel
-make -j4 zImage modules dtbs
+# 64-bit Raspberry Pi
+make -j$(nproc) Image modules dtbs
 ```
 
-### BeagleBone
+Find your outputs:
 
 ```bash
-#export the compiler
-export CROSS_COMPILE=PathToCompiler/arm-linux-cortexa9Compiler
-#export the architecture used
-export ARCH=arm
-
-#configure the kernel with the configuration discuss above
-make menuconfig
-
-#build the kernel
-make -j4 zImage modules dtbs
+ls arch/${ARCH}/boot/                               # zImage or Image
+find arch/${ARCH}/boot/dts -name '<your-dtb>.dtb'   # dtb location differs between kernel versions
 ```
 
-### Compiling modules and store them in rootfs
+| Board | Device tree |
+|---|---|
+| QEMU vexpress-a9 | `vexpress-v2p-ca9.dtb` |
+| Raspberry Pi 3 / 4 | `bcm2710-rpi-3-b.dtb` / `bcm2711-rpi-4-b.dtb` |
+| BeagleBone Black | `am335x-boneblack.dtb` |
 
-The compiled modules have a .ko suffix and are generated in the same directory as the source code, meaning that they are scattered all around the kernel source tree.
+### 5. Install the modules into a staging rootfs
 
-To install them into the staging area of your root filesystem (we will talk about root filesystems in the next chapter), provide the path using **INSTALL_MOD_PATH**:
+Modules (`.ko` files) are scattered across the source tree. `modules_install` collects them into
+`/lib/modules/<kernel version>/` under the folder you choose. You will use this folder as the root
+filesystem in the next lesson.
 
 ```bash
-make -j4 ARCH=arm CROSS_COMPILE=arm-cortex_a8-linux-gnueabihf- INSTALL_MOD_PATH=$HOME/rootfs modules_install
+make -j$(nproc) INSTALL_MOD_PATH=$HOME/rootfs modules_install
 ```
 
-Kernel modules are put into the directory /lib/modules/[kernel version], relative to the root of the filesystem.
-
-## Boot from TFTP server
-
-### Vexpress (Qemu)
-
-Copy the zImage and dtb file to the **tftp server**
+### 6. Copy the kernel and device tree to the TFTP server
 
 ```bash
-cp linux/arch/arm/boot/zImage /srv/tftp/
-cp linux/arch/arm/boot/dts/*-ca9.dtb /srv/tftp/
+# 32-bit example (QEMU)
+cp arch/arm/boot/zImage /srv/tftp/
+cp $(find arch/arm/boot/dts -name vexpress-v2p-ca9.dtb) /srv/tftp/
 ```
 
-Start Qemu to boot on U-boot
+Replace the dtb name with your board's (table in step 4).
+
+### 7. Boot the kernel from U-Boot
+
+Start the board and stop at the U-Boot prompt (QEMU: use [`scripts/run-qemu-uboot.sh`](../scripts/run-qemu-uboot.sh)).
+
+Set the console for your board:
+
+| Board | `bootargs` |
+|---|---|
+| QEMU vexpress-a9 | `console=ttyAMA0` |
+| Raspberry Pi 3 / 4 (with `enable_uart=1`) | `console=ttyS0,115200` |
+| BeagleBone Black | `console=ttyS0,115200` |
 
 ```bash
-sudo qemu-system-arm -M vexpress-a9 -m 128M -nographic -kernel u-boot -sd sd.img -net tap,script=./qemu-ifup -net nic
-```
-
-Set the bootargs to
-
-```bash
-setenv bootargs console=ttyAMA0 
-saveenv
-```
-
-load kernel image `zImage` and DTB `vexpress-v2p-ca9.dtb` from TFTP into RAM
-
-```bash
-tftp $kernel_addr_r zImage
-tftp $fdt_addr_r vexpress-v2p-ca9.dtb
-```
-
-boot the kernel with its device tree
-
-```bash
-bootz $kernel_addr_r - $fdt_addr_r
-```
-
-########## THE KERNEL WONT BOOT IT WILL **PANIC** ###########
-
-### Raspberry PI
-
-Copy the zImage and dtb file to the **tftp server**
-
-```bash
-cp linux/arch/arm/boot/zImage /srv/tftp/
-cp linux/arch/arm/boot/dts/*-ca9.dtb /srv/tftp/
-```
-
-**Plug the Power to RPI and make sure to stop at the U-Boot stage**
-
-Set the `bootargs` to
-
-```bash
-setenv bootargs console=ttyXXX 
+# U-Boot prompt
+setenv bootargs console=ttyAMA0
 saveenv
 
-# get the console tty from cmdline
+# load the kernel and the device tree into RAM
+tftp ${kernel_addr_r} zImage
+tftp ${fdt_addr_r} vexpress-v2p-ca9.dtb
+
+# boot: kernel address, no initramfs (-), device tree address
+bootz ${kernel_addr_r} - ${fdt_addr_r}
 ```
 
-load kernel image `zImage` and DTB `vexpress-v2p-ca9.dtb` from TFTP into RAM
+For a 64-bit kernel load `Image` and use `booti` instead of `bootz`.
 
-```bash
-tftp [Address RAM kernel] zImage
-tftp [Address RAM dtb] bcmXXXX-rpi-X.dtb
+## Checkpoint
 
-#get this address from bdinfo
+You should see the kernel boot messages, your local version in the first line, and then a **panic**:
+
+```text
+Booting Linux on physical CPU 0x0
+Linux version 6.6.x-<yourName>-v1.0 ...
+...
+Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)
 ```
 
-boot the kernel with its device tree
+**This is expected.** The kernel started correctly, but it has no root filesystem to mount and therefore
+no `init` program to run. Building that root filesystem is the next lesson.
 
-```
-bootz [Address RAM kernel] - [Address RAM dtb]
-```
+## Troubleshooting
 
-########## THE KERNEL WONT BOOT IT WILL **PANIC** ###########
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| `Starting kernel ...` then nothing | Wrong `console=` for the board, or wrong dtb | Check the tables in steps 4 and 7 |
+| `Bad Linux ARM zImage magic!` | Loaded the wrong file, or a 64-bit `Image` with `bootz` | Use `zImage` + `bootz` (32-bit) or `Image` + `booti` (64-bit) |
+| `ERROR: Did not find a cmdline Flattened Device Tree` | dtb not loaded or overwritten | Load it at `${fdt_addr_r}` and pass that address to `bootz` |
+| Build error `openssl/opensslv.h: No such file` | Missing host package | `sudo apt install libssl-dev` |
+| Version line doesn't show your name | `LOCALVERSION` not saved | Re-run `make menuconfig`, save, rebuild |
 
-### BeagleBone
+## Exercises
 
-Copy the zImage and dtb file to the **tftp server**
+1. Save the U-Boot commands above in a `bootcmd` variable so the board boots the kernel automatically.
+2. Run `make savedefconfig` and compare the resulting `defconfig` with the one you started from.
+3. Add `loglevel=3` to `bootargs` and compare how much the kernel prints.
 
-```bash
-cp linux/arch/arm/boot/zImage /srv/tftp/
-cp linux/arch/arm/boot/dts/*-ca9.dtb /srv/tftp/
-```
+## Recap
 
-**Plug the Power to RPI and make sure to stop at the U-Boot stage**
-
-Set the `bootargs` to
-
-```bash
-setenv bootargs console=ttyS0 
-saveenv
-```
-
-load kernel image `zImage` and DTB `vexpress-v2p-ca9.dtb` from TFTP into RAM
-
-```bash
-tftp 0x82000000 zImage
-tftp 0x88000000 am3356-bb-X.dtb
-
-# get this address from bdinfo
-```
-
-boot the kernel with its device tree
-
-```
-bootz 0x82000000 - 0x88000000
-```
-
-########## THE KERNEL WONT BOOT IT WILL **PANIC** ###########
+- You built a kernel and device tree and booted them from U-Boot over TFTP.
+- The panic tells you exactly what's missing: a **root filesystem**. That's next.

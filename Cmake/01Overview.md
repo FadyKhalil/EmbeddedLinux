@@ -28,7 +28,7 @@ CMake supports out-of-source builds, meaning the build files and the source code
    cmake path/to/your/project
    ```
 
-3. **Generate:** After configuring, use the generated build files to compile your project. For Makefiles, run:
+3. **Build:** After configuring, use the generated build files to compile your project. For Makefiles, run:
 
    ```bash
    make

@@ -1,5 +1,5 @@
 #minimum version required to start cmake
-cmake_minimum_required(VERSION 3.1...3.22)
+cmake_minimum_required(VERSION 3.16...3.28)
 
 #project name
 project(HelloWorld)

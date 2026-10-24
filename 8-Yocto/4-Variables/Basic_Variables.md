@@ -1,55 +1,77 @@
-# Basic Variables
+# 8.5 - Basic Variables
 
-## Popular Variables
+> Learn the variables every recipe uses, and how to read their values.
 
-- **PN** (Package Name)
-- **PV** (Package Version)
-- **PR** (Package Revision)
-- **WORKDIR** (Working Directory)
-- **S** (Source)
-- **D** (Destination)
-- **B** (Build Directory)
+| | |
+|---|---|
+| **Previous** | [8.4 - Layers](../3-Layer/README.md) |
+| **Next** | [8.6 - Variable assignment](Variable_Assignment.md) |
 
+## Popular variables
 
+| Variable | Meaning | Default |
+|---|---|---|
+| `PN` | Package (recipe) name | From the file name |
+| `PV` | Package version | From the file name, else `1.0` |
+| `PR` | Package revision | `r0` |
+| `WORKDIR` | The recipe's work directory | A folder under `${TMPDIR}/work/` |
+| `S` | Unpacked source code | `${WORKDIR}/${BPN}-${PV}` |
+| `B` | Build directory | `${S}` |
+| `D` | Install destination used by `do_install` | `${WORKDIR}/image` |
 
-## How to Declare Recipe
+## How the recipe file name sets PN and PV
 
-myrecipe_**0.1_r0**.bb
-
-The part of the name in bold, such as "0.1," indicates the specific version of the recipe, "r0" represent the package revision.
-
-
-
-## How to Read Variable Value
-
+```text
+myrecipe_0.1.bb
+   |      |
+   PN     PV
 ```
-bitbake -e <RECIPE_NAME> | grep ^<VARIABLE_NAME>=
+
+The part before the underscore is the recipe name (`PN`), the part after is the version (`PV`).
+`PR` is **not** part of the file name; set it inside the recipe if you need it (`PR = "r1"`).
+
+## How to read a variable's value
+
+```bash
+bitbake -e <recipe_name> | grep ^<VARIABLE_NAME>=
+
+# newer and shorter
+bitbake-getvar -r <recipe_name> <VARIABLE_NAME>
 ```
 
-## Package Name (PN)
+## Details
 
-**PN** refers to a recipe name used by the Yocto build system as input to create a package. The name is extracted from the recipe file name.
+### Package name (`PN`)
 
-## Package Version (PV)
+The name of the recipe, used by the build system as input to create packages. Extracted from the recipe file name.
 
-**PV** is the version of the recipe. The version is normally extracted from the recipe filename.
+### Package version (`PV`)
 
-## Package Revision (PR)
+The version of the recipe, normally extracted from the recipe file name.
 
-The revision of the recipe. The default value for this variable is “r0”
+### Package revision (`PR`)
 
-## Working Directory (WORKDIR)
+The revision of the recipe. Default `r0`.
 
-The **WORKDIR** is the pathname of the work directory in which the Yocto build system builds a recipe. This directory is located within the TMPDIR directory structure and is specific to the recipe being built and the system for which it is being built.
+### Working directory (`WORKDIR`)
 
-## Source (S)
+The path where the build system builds the recipe. It's inside `TMPDIR` and is specific to the recipe and the
+target it's built for.
 
-S is the location in the Build Directory where unpacked recipe source code resides. By default, this directory is WORKDIR/BPN-PV, where BPN is the base recipe name and PV is the recipe version.
+### Source (`S`)
 
-## Destination (D)
+Where the unpacked source code is. Default `${WORKDIR}/${BPN}-${PV}`, where `BPN` is the base recipe name.
+Recipes that fetch from git usually set `S = "${WORKDIR}/git"`.
 
-D is the destination directory. It is the location in the Build Directory where components are installed by the do_install task. This location defaults to WORKDIR/image.
+### Destination (`D`)
 
-## Build Directory (B)
+Where `do_install` puts the files. Default `${WORKDIR}/image`; everything here ends up in the packages.
 
-It is same as S.
+### Build directory (`B`)
+
+Where compilation happens. Same as `S` by default; some classes (e.g. `cmake`) use a separate folder.
+
+## Exercises
+
+1. Print `PN`, `PV`, `S` and `D` for the `busybox` recipe.
+2. Rename your recipe from `example_0.1.bb` to `example_0.2.bb` and check `PV` again.

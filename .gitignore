@@ -1,0 +1,11 @@
+# Build outputs and images created while following the lessons
+*.img
+*.o
+*.a
+*.so
+*.ko
+*.cpio
+*.cpio.gz
+uRamdisk
+build/
+build.log

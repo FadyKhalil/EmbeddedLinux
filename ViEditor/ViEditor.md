@@ -55,7 +55,8 @@ Vi is a powerful and widely used text editor in Linux. Below are some useful ope
 - `?pattern` : Search backward for the specified pattern.
 - `n` : Move to the next occurrence of the search pattern.
 - `N` : Move to the previous occurrence of the search pattern.
-- `:s/old/new/g` : Replace all occurrences of "old" with "new" in the entire file.
+- `:s/old/new/g` : Replace all occurrences of "old" with "new" in the current line.
+- `:%s/old/new/g` : Replace all occurrences in the entire file.
 - `:n,ms/old/new/g` : Replace all occurrences in the range from line `n` to line `m`.
 
 ## Saving and Quitting

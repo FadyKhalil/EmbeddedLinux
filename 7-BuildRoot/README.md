@@ -1,207 +1,184 @@
-# BuildRoot
+# 7 - Buildroot
 
-## Download Required Library
+> Let Buildroot build the toolchain, bootloader, kernel and root filesystem for you, then add your own package.
+
+| | |
+|---|---|
+| **Boards** | QEMU (vexpress-a9) · Raspberry Pi 3 / 4 · BeagleBone Black |
+| **Time** | ~30 min of work + 1-2 hours first build |
+| **Previous** | [6 - Init process](../6-InitProcess/README.md) |
+| **Next** | [8 - Yocto Project](../8-Yocto/README.md) |
+
+## What you will learn
+
+- How Buildroot automates everything you did by hand in lessons 2-6
+- How to start from a board `defconfig` and customise the system
+- How to reconfigure the kernel, U-Boot and BusyBox from inside Buildroot
+- How to boot the generated image
+- How to add **your own package** to the root filesystem
+
+## Prerequisites
+
+- Lessons 2-6, so you know what each piece does
+- About 15 GB of free disk space
+- Host packages:
 
 ```bash
-sudo apt install sed make binutils gcc g++ bash patch \
-gzip bzip2 perl tar cpio python unzip rsync wget libncurses-dev
+sudo apt install sed make binutils build-essential diffutils gcc g++ bash patch \
+    gzip bzip2 perl tar cpio unzip rsync file bc findutils wget python3 libncurses-dev
 ```
 
-## Download BuildRoot
+## Background
+
+Buildroot is a set of Makefiles and patches. From one configuration file it produces:
+
+| Output (`output/images/`) | What you built by hand |
+|---|---|
+| Toolchain (in `output/host/`) | Lesson 2 |
+| `u-boot.bin` / `MLO`, `u-boot.img` | Lesson 3 |
+| `zImage`, `*.dtb` | Lesson 4 |
+| `rootfs.ext2` / `rootfs.tar` | Lessons 5 and 6 |
+| `sdcard.img` | Everything combined, ready to write to an SD card |
+
+## Steps
+
+### 1. Download Buildroot
 
 ```bash
 git clone https://github.com/buildroot/buildroot.git
 cd buildroot
+git checkout 2024.02          # long-term support release; pick the latest LTS
 
-#to Require help
-make help
+make help                     # list every target Buildroot understands
 ```
 
-## Configuration
-
-To List all board configuration supported by Buildroot 
+### 2. Load a board configuration
 
 ```bash
-make list-defconfigs
-
-# Or you can list the files inside 
-ls configs/
+# list all supported boards
+make list-defconfigs          # or: ls configs/
 ```
 
-### Configure  Beaglebone
+| Board | Command |
+|---|---|
+| QEMU vexpress-a9 | `make qemu_arm_vexpress_defconfig` |
+| Raspberry Pi 3 | `make raspberrypi3_defconfig` |
+| Raspberry Pi 4 | `make raspberrypi4_defconfig` |
+| BeagleBone Black | `make beaglebone_defconfig` |
+
+### 3. Customise the system
 
 ```bash
-#configure beaglebone to buildroot
-make beaglebone_defconfig
-```
-
-### Configure Raspberry Pi
-
-```bash
-# listing the defconfigs you will find several rasberry Pi
-# Example
-make raspberrypi3_defconfig
-```
-
-### Configure Qemu
-
-```bash
-# configure qemu vexpress
-make qemu_arm_vexpress_defconfig
-```
-
-### Configure buildroot
-
-```bash
-# to configure the buildroot
 make menuconfig
 ```
 
-In the configuration, configure the following **requirement**:
+Apply these requirements:
 
-- [ ]  Init procecss to **System V** or **System D** or **Busybox init**
+| Requirement | Where in menuconfig |
+|---|---|
+| Init system: **BusyBox**, **System V** or **systemd** | System configuration → Init system |
+| Change the **hostname** | System configuration → System hostname |
+| Change the **banner** | System configuration → System banner |
+| Set a **root password** | System configuration → Root password |
+| Add an **SSH server** | Target packages → Networking applications → dropbear |
 
-`In case of using systemD increase the root file system size from build root configuartion`
+> With **systemd**, also increase Filesystem images → exact size (e.g. `256M`), otherwise the rootfs may not fit.
 
-- [ ]  Change **system host**
-- [ ] Change **system banner**
-- [ ]  Appy **root password**
-
-#### Configure SSH
-
-In order to configure SSH and add the executable in rootfs in **buildroot**
-
-- [ ]  Enable in **Network application** configure **dropbear**
-- [ ]  Set **Root password** in **system configuration**
-
-## Build the System
+### 4. Build
 
 ```bash
-# It will build the buildroot 
-# Register the logs for debugging
+# keep a log for debugging
 make 2>&1 | tee build.log
-
-#### WARNING it will take up to 2 hours ####
 ```
 
-## Configure Embedded Linux Component
+⏳ The first build downloads and compiles everything and can take **1-2 hours**. Later builds are much faster.
 
-### Configure Linux
+### 5. Reconfigure individual components
 
 ```bash
-# to change configuration for linux 
-make linux-menuconfig
+make linux-menuconfig       # kernel
+make uboot-menuconfig       # U-Boot (boards that use it)
+make busybox-menuconfig     # BusyBox
+
+make                        # rebuild after any change
 ```
 
-### Configure uboot
+### 6. Boot the system
+
+#### QEMU
 
 ```bash
-# to configure uboot
-make uboot-menuconfig
+# Buildroot generates a launcher script for QEMU boards
+./output/images/start-qemu.sh
 ```
 
-### Configure Busybox
+Or the full command (from `board/qemu/arm-vexpress/readme.txt`):
 
 ```bash
-# to configure busybox
-make busybox-menuconfig
+qemu-system-arm -M vexpress-a9 -smp 1 -m 256 \
+    -kernel output/images/zImage \
+    -dtb output/images/vexpress-v2p-ca9.dtb \
+    -drive file=output/images/rootfs.ext2,if=sd,format=raw \
+    -append "console=ttyAMA0,115200 rootwait root=/dev/mmcblk0" \
+    -serial stdio -net nic,model=lan9118 -net user
 ```
 
-## Boot The System
-
-### Qemu
+#### Raspberry Pi and BeagleBone Black
 
 ```bash
-# Run the system on Qemu
-qemu-system-arm -M vexpress-a9 -m 128M -sd output/image/sdcard.img -kernel output/image/u-boot.img -nograhic
+# ⚠️ find your SD card with lsblk first; this overwrites it completely
+sudo dd if=output/images/sdcard.img of=/dev/mmcblk<x> bs=4M conv=fsync status=progress
 ```
 
-### BeagleBone
+Put the card in the board and power it on (BeagleBone: hold **S2**).
+
+### 7. Add your own package
+
+Suppose you have an application `simpleapp` (one source file and a Makefile) that you want in the rootfs.
+A Buildroot package needs three files:
+
+```text
+package/simpleapp/
+├── Config.in          # makes it appear in menuconfig
+├── simpleapp.mk       # tells Buildroot how to build and install it
+└── src/
+    ├── simpleapp.c    # your code
+    └── Makefile       # how to compile it
+```
+
+#### 7.1 Source code
 
 ```bash
-# First we need to format the sd card
-dd if=/dev/zero of=/dev/mmcblk0 bs=1M
-#### warning it will take some time ####
-
-# Add the Sd image to the SD card
-dd if=output/images/sdcard.img of=/dev/mmcblk0 bs=1M
+mkdir -p package/simpleapp/src
+vim package/simpleapp/src/simpleapp.c
 ```
-
-### Raspberry Pi
-
-```bash
-# First we need to format the sd card
-dd if=/dev/zero of=/dev/mmcblk0 bs=1M
-#### warning it will take some time ####
-
-# Add the Sd image to the SD card
-dd if=output/images/sdcard.img of=/dev/mmcblk0 bs=1M
-```
-
-# Create Buildroot Package
-
-Suppose you have a personalized package named "**simpleapp**" that you want to add to your Root File System (Root FS) that you are creating with buildroot. In the simplest scenario, this package would include a source file and a makefile.
-
-1.  Create folder under package as following
-
-```bash
-mkdir -p ./package/simpleapp/src
-```
-
-2. Create source file under **src** and write a simple code
-
-```bash
-touch simpleapp && vim simpleapp
-# or for shortcut
-vim simpleapp
-```
-
-Inside the simple app write the following simple code
 
 ```c
 #include <stdio.h>
 
 int main(void) {
 	printf("Hi People\r\n");
+	return 0;
 }
 ```
 
-3. No we need to create the Makefile that buildroot will use it to compile the following app
+#### 7.2 The app's Makefile
 
-```bash
-# under src directory create Makefile
-touch Makefile
-# edit the Makefile
-vim Makefile
-```
-
-Inside the Makefile write the following recipe
+`package/simpleapp/src/Makefile` (**recipe lines must start with a Tab**, not spaces):
 
 ```makefile
-
 .PHONY: clean
-.PHONY: simpleapp
 
 simpleapp: simpleapp.c
-        $(CC) -g -Wall $(CFLAGS) $(LDFLAGS) $< -o $@
+	$(CC) -g -Wall $(CFLAGS) $(LDFLAGS) $< -o $@
 
 clean:
-        -rm simpleapp
-        
-#### NOTE: Makefile requires a tab character for indentation. Spaces will not work. ####
-
+	-rm -f simpleapp
 ```
 
-4. Create a package definition for this package in the buildroot source tree.
+#### 7.3 The package recipe
 
-```
-# under package/simpleapp create the following Makefile
-touch simpleapp.mk
-# and edit the makefile
-vim simpleapp.mk
-```
-
-Add the following script inside the makefile
+`package/simpleapp/simpleapp.mk`:
 
 ```makefile
 ################################################################################
@@ -212,87 +189,99 @@ Add the following script inside the makefile
 
 SIMPLEAPP_VERSION = 1.0
 SIMPLEAPP_SITE = package/simpleapp/src
-SIMPLEAPP_SITE_METHOD = local# Other methods like git,wget,scp,file etc. are also available.
+# local = take the source from a folder; git, wget, scp, file... are also available
+SIMPLEAPP_SITE_METHOD = local
 
 define SIMPLEAPP_BUILD_CMDS
-    $(MAKE) CC="$(TARGET_CC)" LD="$(TARGET_LD)" -C $(@D)
+	$(MAKE) CC="$(TARGET_CC)" LD="$(TARGET_LD)" -C $(@D)
 endef
 
 define SIMPLEAPP_INSTALL_TARGET_CMDS
-    $(INSTALL) -D -m 0755 $(@D)/simpleapp  $(TARGET_DIR)/usr/bin
+	$(INSTALL) -D -m 0755 $(@D)/simpleapp $(TARGET_DIR)/usr/bin/simpleapp
 endef
 
 $(eval $(generic-package))
-
 ```
 
-Then create the configuration file that will be used by builroot to show the package in menuconfig
+#### 7.4 The menu entry
 
-```bash
-touch Config.in && vim Config.in
-```
-
-Inside the file add the following configuration
+`package/simpleapp/Config.in`:
 
 ```bash
 config BR2_PACKAGE_SIMPLEAPP
-    bool "simpleapp"
-    help
-        simpleapp package.
+	bool "simpleapp"
+	help
+	  simpleapp package.
 ```
 
-5. Add the new Config.in in the configuration for buildroot
-
-Under **package directory**
-
-```bash
-vim ./package/Config.in
-```
-
-Add new menu under Target Package
+Then add it to Buildroot's package menu by editing `package/Config.in`, inside `menu "Target packages"`:
 
 ```makefile
 menu "SIMPLEAPP Packages"
-    source "package/simpleapp/Config.in"
+	source "package/simpleapp/Config.in"
 endmenu
 ```
 
-6. Enable the package in buildroot menuconfig
+#### 7.5 Enable and build
 
 ```bash
-# change directory to builroot
-cd builroot
-# configure the builroot
-make menuconfig
-
-# under target package you will find simpleapp
-# add it to the configuration
+make menuconfig       # Target packages → SIMPLEAPP Packages → [*] simpleapp
+make -j$(nproc)
 ```
 
-7. Build builroot again
-
-After building the builroot the execution file for simple app will be add it to the rootfs
+After changing the source later, rebuild only your package and the image:
 
 ```bash
-# build the buildroot
-make -j8
+make simpleapp-rebuild all
 ```
 
-# Tips and Tricks
+## Checkpoint
 
-We can create a file to give U-Boot commands without setting the bootloader manually. 
+```text
+Welcome to Buildroot
+buildroot login: root
+Password:
+# simpleapp
+Hi People
+```
+
+(The banner and hostname are the ones you set in step 3.)
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| `You seem to have the current working directory in your PATH` | `.` or an empty entry in `PATH` | Remove it, e.g. open a fresh terminal |
+| `Makefile: *** missing separator` | Spaces instead of a Tab in a recipe | Use a real Tab character |
+| `simpleapp` not in menuconfig | `package/Config.in` not edited, or typo in `source` path | Check step 7.4 |
+| Build fails after changing a toolchain/arch option | Old build artefacts | `make clean all` (full rebuild) |
+| systemd image: `No space left on device` | Rootfs size too small | Increase the filesystem size (step 3 note) |
+
+## Tips and tricks
+
+### Boot without typing U-Boot commands: `extlinux.conf`
+
+U-Boot can read a boot menu from the boot partition, so you don't have to type `bootargs` by hand:
 
 ```bash
-# Create a folder and file in the `boot` partition:
+# on the boot (FAT) partition
 mkdir extlinux && touch extlinux/extlinux.conf
 ```
 
-Add the following content in the file
-
-```bash
+```text
 label buildroot
-        kernel /zImage
-        devicetree /am335x-boneblack.dtb
-        append console=ttyO0,115200 root=/dev/mmcblk0p2 rootwait
+	kernel /zImage
+	devicetree /am335x-boneblack.dtb
+	append console=ttyS0,115200 root=/dev/mmcblk0p2 rootwait
 ```
 
+## Exercises
+
+1. Switch the init system to systemd and add the `deamonapp.service` from [lesson 6](../6-InitProcess/README.md) using a rootfs overlay (*System configuration → Root filesystem overlay directories*).
+2. Change `simpleapp` to print the hostname, then use `make simpleapp-rebuild all`.
+3. Run `make savedefconfig BR2_DEFCONFIG=configs/my_board_defconfig` to save your configuration.
+
+## Recap
+
+- One `make` now produces everything you built by hand, and custom packages slot in with three small files.
+- Next, the **Yocto Project** does the same at industrial scale with layers and recipes.

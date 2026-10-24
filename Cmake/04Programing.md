@@ -7,7 +7,7 @@
 Cmake is like any other programing language and it support if condition 
 
 ```cmake
-f(variable)
+if(variable)
     # If variable is `ON`, `YES`, `TRUE`, `Y`, or non zero number
 else()
     # If variable is `0`, `OFF`, `NO`, `FALSE`, `N`, `IGNORE`, `NOTFOUND`, `""`, or ends in `-NOTFOUND`

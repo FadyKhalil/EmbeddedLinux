@@ -5,10 +5,10 @@
 Here's the first line of every `CMakeLists.txt`, which is the required name of the file CMake looks for:
 
 ```cmake
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.16)
 
 # you can set a version from to by the following
-cmake_minimum_required(VERSION 3.1...3.12)
+cmake_minimum_required(VERSION 3.16...3.28)
 ```
 
 The `cmake_minimum_required` command in CMake is required to set the version of the current cmake file use. The `VERSION` is a special keyword for this function, and the version value follows the keyword. In this documentation, you can click on the command name to access the [official documentation](https://cmake.org/cmake/help/latest/command/cmake_minimum_required.html). 
@@ -52,18 +52,22 @@ if you left it empty the library will be created by the value stored in the vari
 in order to include more directory to let cmake look at we use the [`target_include_directories`](https://cmake.org/cmake/help/latest/command/target_include_directories.html)
 
 ```cmake
-target_include_directories(hellobinary INTERFACE include/)
+target_include_directories(hellobinary PRIVATE include/)
 ```
 
-here we are including `include` directory to the project to let cmake look at. `PUBLIC` explain that any target need target `hellobinary` must include the `include` file.
+here we add the `include` directory to the header search path of `hellobinary`. The keyword says **who** gets that path:
 
-`INTERFACE` here is used if nothing depends on the directory include, is usually used with header file, as header file are not part of the compilation process.
+| Keyword | Used when building the target itself | Passed to targets that link to it |
+|---|---|---|
+| `PRIVATE` | Yes | No |
+| `PUBLIC` | Yes | Yes |
+| `INTERFACE` | No | Yes (typical for header-only libraries) |
 
 [`target_link_libraries`](https://cmake.org/cmake/help/latest/command/target_link_libraries.html) is used to link a library to the executable that will be created, example:
 
 ```cmake
 #link the library
-target_link_libraries(helloworld PUBLIC operation)
+target_link_libraries(hellobinary PUBLIC operation)
 ```
 
 we will discuss later how we created the operation mentioned.
@@ -72,7 +76,7 @@ we will discuss later how we created the operation mentioned.
 
 ```cmake
 #version required
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.16)
 
 project(Calculator LANGUAGES CXX)
 
