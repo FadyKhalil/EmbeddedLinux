@@ -1,0 +1,1 @@
+source "$BR2_EXTERNAL_COURSE_PATH/package/heartbeat/Config.in"

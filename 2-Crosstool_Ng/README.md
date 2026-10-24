@@ -1,1 +1,0 @@
-# EmbeddedLinux Course

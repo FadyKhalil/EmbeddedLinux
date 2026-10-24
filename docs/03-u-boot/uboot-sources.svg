@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="el-svg" width="900" height="300" viewBox="0 0 900 300" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<style>
+.el-svg:not(.el-inline){--el-fg:#1f2430;--el-muted:#5f6675;--el-box:#f4f5fb;--el-line:#9aa3b8;--el-accent:#ff5722;--el-accent-soft:#fff0e8;--el-primary:#3f51b5;--el-primary-soft:#e8eaf6;--el-ok:#2e7d32;--el-bad:#c62828}
+@media (prefers-color-scheme:dark){.el-svg:not(.el-inline){--el-fg:#e6e8ee;--el-muted:#9aa1b0;--el-box:#262a36;--el-line:#5c6478;--el-accent:#ff7043;--el-accent-soft:#4a2c20;--el-primary:#7986cb;--el-primary-soft:#2b3152;--el-ok:#66bb6a;--el-bad:#ef5350}}
+.el-svg .box{fill:var(--el-box);stroke:var(--el-line);stroke-width:1.5}
+.el-svg .soft{fill:var(--el-primary-soft);stroke:var(--el-primary);stroke-width:1.5}
+.el-svg .card{fill:none;stroke:var(--el-primary);stroke-width:2}
+.el-svg .title{fill:var(--el-fg);font-size:15px;font-weight:600}
+.el-svg .sub{fill:var(--el-muted);font-size:13px}
+.el-svg .mono{fill:var(--el-fg);font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+.el-svg .arrow{stroke:var(--el-line);stroke-width:2;fill:none}
+.el-svg .ahead{fill:var(--el-line)}
+</style>
+<defs>
+<marker id="ah-ub" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" class="ahead"/></marker>
+</defs>
+<g data-active="1"><rect class="box" x="20" y="96" width="150" height="90" rx="10"/><text class="title" x="95" y="134" text-anchor="middle">SoC</text><text class="sub" x="95" y="154" text-anchor="middle">ROM code</text></g>
+<g data-from="2" data-active="2-5"><rect class="soft" x="20" y="206" width="150" height="64" rx="10"/><text class="title" x="95" y="232" text-anchor="middle">U-Boot</text><text class="mono" x="95" y="254" text-anchor="middle">=&gt; _</text></g>
+<path class="card" d="M240,20 H500 L520,40 V280 H240 Z"/>
+<text class="title" x="380" y="44" text-anchor="middle">SD card</text>
+<rect class="box" x="256" y="58" width="248" height="140" rx="6"/>
+<text class="sub" x="380" y="78" text-anchor="middle">partition 1 · FAT16 · boot</text>
+<g data-active="1"><rect class="box" x="272" y="88" width="216" height="22" rx="4"/><text class="mono" x="380" y="104" text-anchor="middle">MLO / bootcode.bin</text></g>
+<g data-active="2"><rect class="box" x="272" y="114" width="216" height="22" rx="4"/><text class="mono" x="380" y="130" text-anchor="middle">u-boot.img / u-boot.bin</text></g>
+<g data-active="3"><rect class="box" x="272" y="140" width="216" height="22" rx="4"/><text class="mono" x="380" y="156" text-anchor="middle">uboot.env</text></g>
+<g data-active="5"><rect class="box" x="272" y="166" width="216" height="22" rx="4"/><text class="mono" x="380" y="182" text-anchor="middle">zImage, *.dtb  (optional)</text></g>
+<rect class="box" x="256" y="210" width="248" height="56" rx="6"/>
+<text class="sub" x="380" y="232" text-anchor="middle">partition 2 · ext4</text>
+<text class="mono" x="380" y="252" text-anchor="middle">root filesystem (lesson 5)</text>
+<line class="arrow" x1="270" y1="99" x2="174" y2="132" marker-end="url(#ah-ub)" data-active="1"/>
+<line class="arrow" x1="270" y1="125" x2="174" y2="226" marker-end="url(#ah-ub)" data-active="2" data-from="2"/>
+<line class="arrow" x1="270" y1="151" x2="174" y2="240" marker-end="url(#ah-ub)" data-active="3" data-from="3"/>
+<g data-active="4"><rect class="box" x="590" y="20" width="290" height="120" rx="10"/><text class="title" x="735" y="44" text-anchor="middle">Host PC</text><text class="sub" x="735" y="64" text-anchor="middle">TFTP server · /srv/tftp</text><rect class="soft" x="610" y="84" width="120" height="28" rx="4"/><text class="mono" x="670" y="103" text-anchor="middle">zImage</text><rect class="soft" x="740" y="84" width="120" height="28" rx="4"/><text class="mono" x="800" y="103" text-anchor="middle">board.dtb</text></g>
+<g data-active="4-5"><rect class="box" x="590" y="190" width="290" height="80" rx="10"/><text class="title" x="735" y="216" text-anchor="middle">RAM</text><text class="mono" x="735" y="244" text-anchor="middle">${kernel_addr_r}  ${fdt_addr_r}</text></g>
+<line class="arrow" x1="735" y1="142" x2="735" y2="186" marker-end="url(#ah-ub)" data-active="4" data-from="4"/>
+<line class="arrow" x1="490" y1="177" x2="586" y2="222" marker-end="url(#ah-ub)" data-active="5" data-from="5"/>
+<text class="sub" x="555" y="134" text-anchor="middle" data-from="4">network</text>
+</svg>

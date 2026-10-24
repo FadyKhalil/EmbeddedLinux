@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="el-svg" width="900" height="270" viewBox="0 0 900 270" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<style>
+.el-svg:not(.el-inline){--el-fg:#1f2430;--el-muted:#5f6675;--el-box:#f4f5fb;--el-line:#9aa3b8;--el-accent:#ff5722;--el-accent-soft:#fff0e8;--el-primary:#3f51b5;--el-primary-soft:#e8eaf6;--el-ok:#2e7d32;--el-bad:#c62828}
+@media (prefers-color-scheme:dark){.el-svg:not(.el-inline){--el-fg:#e6e8ee;--el-muted:#9aa1b0;--el-box:#262a36;--el-line:#5c6478;--el-accent:#ff7043;--el-accent-soft:#4a2c20;--el-primary:#7986cb;--el-primary-soft:#2b3152;--el-ok:#66bb6a;--el-bad:#ef5350}}
+.el-svg .box{fill:var(--el-box);stroke:var(--el-line);stroke-width:1.5}
+.el-svg .soft{fill:var(--el-primary-soft);stroke:var(--el-primary);stroke-width:1.5}
+.el-svg .title{fill:var(--el-fg);font-size:15px;font-weight:600}
+.el-svg .sub{fill:var(--el-muted);font-size:13px}
+.el-svg .mono{fill:var(--el-fg);font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+.el-svg .arrow{stroke:var(--el-line);stroke-width:2;fill:none}
+.el-svg .ahead{fill:var(--el-line)}
+.el-svg .ok{fill:var(--el-ok);font-size:14px;font-weight:600}
+.el-svg .bad{fill:var(--el-bad);font-size:14px;font-weight:600}
+</style>
+<defs>
+<marker id="ah-cross" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" class="ahead"/></marker>
+</defs>
+<g data-active="1"><rect class="box" x="20" y="112" width="120" height="46" rx="8"/><text class="title" x="80" y="140" text-anchor="middle">hello.c</text></g>
+<line class="arrow" x1="142" y1="126" x2="196" y2="82" marker-end="url(#ah-cross)"/>
+<line class="arrow" x1="142" y1="144" x2="196" y2="190" marker-end="url(#ah-cross)" data-from="3"/>
+<g data-active="2"><rect class="box" x="200" y="52" width="160" height="48" rx="8"/><text class="title" x="280" y="73" text-anchor="middle">gcc</text><text class="sub" x="280" y="91" text-anchor="middle">host compiler</text></g>
+<g data-from="3" data-active="3"><rect class="soft" x="200" y="172" width="160" height="48" rx="8"/><text class="title" x="280" y="193" text-anchor="middle">arm-…-gcc</text><text class="sub" x="280" y="211" text-anchor="middle">cross compiler</text></g>
+<line class="arrow" x1="362" y1="76" x2="416" y2="76" marker-end="url(#ah-cross)" data-from="2"/>
+<g data-from="2" data-active="2"><rect class="box" x="420" y="52" width="170" height="48" rx="8"/><text class="title" x="505" y="73" text-anchor="middle">hello</text><text class="mono" x="505" y="91" text-anchor="middle">ELF 64-bit x86-64</text></g>
+<line class="arrow" x1="362" y1="196" x2="416" y2="196" marker-end="url(#ah-cross)" data-from="3"/>
+<g data-from="3" data-active="3"><rect class="box" x="420" y="172" width="170" height="48" rx="8"/><text class="title" x="505" y="193" text-anchor="middle">hello</text><text class="mono" x="505" y="211" text-anchor="middle">ELF 32-bit ARM</text></g>
+<g data-from="2"><line class="arrow" x1="592" y1="68" x2="646" y2="42" marker-end="url(#ah-cross)"/><line class="arrow" x1="592" y1="84" x2="646" y2="92" marker-end="url(#ah-cross)"/></g>
+<g data-from="2" data-active="2"><rect class="box" x="650" y="22" width="230" height="40" rx="8"/><text class="ok" x="765" y="47" text-anchor="middle">✓ runs on your PC</text></g>
+<g data-from="2" data-active="2"><rect class="box" x="650" y="72" width="230" height="40" rx="8"/><text class="bad" x="765" y="97" text-anchor="middle">✗ board: Exec format error</text></g>
+<line class="arrow" x1="592" y1="196" x2="646" y2="196" marker-end="url(#ah-cross)" data-from="4"/>
+<g data-from="4" data-active="4"><rect class="box" x="650" y="172" width="230" height="48" rx="8"/><text class="ok" x="765" y="201" text-anchor="middle">✓ runs on the board</text></g>
+<text class="sub" x="450" y="256" text-anchor="middle">Both compilers run on the same x86-64 PC. Only the CPU they generate code for is different.</text>
+</svg>

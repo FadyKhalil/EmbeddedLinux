@@ -1,0 +1,15 @@
+# Build outputs and images created while following the lessons
+*.img
+*.o
+*.a
+*.so
+*.ko
+*.cpio
+*.cpio.gz
+uRamdisk
+build/
+build.log
+
+# demo app binary and the built website
+docs/06-init/app/heartbeat
+site/

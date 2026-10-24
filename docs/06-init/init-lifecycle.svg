@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="el-svg" width="900" height="300" viewBox="0 0 900 300" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<style>
+.el-svg:not(.el-inline){--el-fg:#1f2430;--el-muted:#5f6675;--el-box:#f4f5fb;--el-line:#9aa3b8;--el-accent:#ff5722;--el-accent-soft:#fff0e8;--el-primary:#3f51b5;--el-primary-soft:#e8eaf6;--el-ok:#2e7d32;--el-bad:#c62828}
+@media (prefers-color-scheme:dark){.el-svg:not(.el-inline){--el-fg:#e6e8ee;--el-muted:#9aa1b0;--el-box:#262a36;--el-line:#5c6478;--el-accent:#ff7043;--el-accent-soft:#4a2c20;--el-primary:#7986cb;--el-primary-soft:#2b3152;--el-ok:#66bb6a;--el-bad:#ef5350}}
+.el-svg .box{fill:var(--el-box);stroke:var(--el-line);stroke-width:1.5}
+.el-svg .soft{fill:var(--el-primary-soft);stroke:var(--el-primary);stroke-width:1.5}
+.el-svg .title{fill:var(--el-fg);font-size:15px;font-weight:600}
+.el-svg .sub{fill:var(--el-muted);font-size:13px}
+.el-svg .mono{fill:var(--el-fg);font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+.el-svg .arrow{stroke:var(--el-line);stroke-width:2;fill:none}
+.el-svg .ahead{fill:var(--el-line)}
+.el-svg .ok{fill:var(--el-ok)}
+.el-svg .bad{fill:var(--el-bad)}
+.el-svg:not(.el-inline) .only-anim{display:none}
+</style>
+<defs>
+<marker id="ah-init" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" class="ahead"/></marker>
+</defs>
+<g data-active="1"><rect class="box" x="20" y="20" width="150" height="44" rx="10"/><text class="title" x="95" y="47" text-anchor="middle">Kernel</text></g>
+<line class="arrow" x1="95" y1="66" x2="95" y2="106" marker-end="url(#ah-init)"/>
+<g data-active="1-2,5"><rect class="soft" x="20" y="110" width="150" height="70" rx="10"/><text class="title" x="95" y="140" text-anchor="middle">/sbin/init</text><text class="sub" x="95" y="162" text-anchor="middle">PID 1</text></g>
+<line class="arrow" x1="172" y1="140" x2="216" y2="120" marker-end="url(#ah-init)" data-active="2"/>
+<rect class="box" x="220" y="20" width="380" height="200" rx="10" data-active="2"/>
+<text class="sub" x="410" y="42" text-anchor="middle">/etc/inittab</text>
+<g data-active="3"><rect class="box" x="236" y="56" width="348" height="34" rx="6"/><text class="mono" x="410" y="77" text-anchor="middle">::sysinit:/etc/init.d/heartbeat start</text></g>
+<g data-active="4"><rect class="box" x="236" y="100" width="348" height="34" rx="6"/><text class="mono" x="410" y="121" text-anchor="middle">::askfirst:-/bin/sh</text></g>
+<g data-active="5-6"><rect class="box" x="236" y="144" width="348" height="34" rx="6"/><text class="mono" x="410" y="165" text-anchor="middle">::shutdown:/etc/init.d/heartbeat stop</text></g>
+<line class="arrow" x1="586" y1="73" x2="636" y2="73" marker-end="url(#ah-init)" data-from="3"/>
+<line class="arrow" x1="586" y1="117" x2="636" y2="117" marker-end="url(#ah-init)" data-from="4"/>
+<path class="arrow" d="M586,161 C620,161 640,130 690,94" marker-end="url(#ah-init)" data-from="6" data-until="6" data-active="6"/>
+<g data-from="3" data-active="3,6-7"><rect class="box" x="640" y="56" width="240" height="34" rx="6"/></g>
+<text class="mono" x="760" y="77" text-anchor="middle" data-from="3" data-until="5">heartbeat  ♥  running</text>
+<text class="mono bad only-anim" x="760" y="77" text-anchor="middle" data-from="6" data-until="6">← SIGTERM</text>
+<text class="mono ok only-anim" x="760" y="77" text-anchor="middle" data-from="7">exited cleanly ✓</text>
+<g data-from="4" data-until="6" data-active="4"><rect class="box" x="640" y="100" width="240" height="34" rx="6"/><text class="mono" x="760" y="121" text-anchor="middle">/bin/sh on the console</text></g>
+<rect class="box" x="220" y="236" width="660" height="50" rx="10"/>
+<text class="sub" x="240" y="266">console</text>
+<text class="mono" x="560" y="266" text-anchor="middle" data-from="3" data-until="4">heartbeat: beat #3 at 10:42:07</text>
+<text class="mono only-anim" x="560" y="266" text-anchor="middle" data-from="5" data-until="6"># reboot</text>
+<text class="mono only-anim" x="560" y="266" text-anchor="middle" data-from="7">heartbeat: stop signal received, exiting cleanly</text>
+</svg>

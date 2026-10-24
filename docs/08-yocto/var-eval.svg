@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="el-svg" width="900" height="280" viewBox="0 0 900 280" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<style>
+.el-svg:not(.el-inline){--el-fg:#1f2430;--el-muted:#5f6675;--el-box:#f4f5fb;--el-line:#9aa3b8;--el-accent:#ff5722;--el-accent-soft:#fff0e8;--el-primary:#3f51b5;--el-primary-soft:#e8eaf6;--el-ok:#2e7d32;--el-bad:#c62828}
+@media (prefers-color-scheme:dark){.el-svg:not(.el-inline){--el-fg:#e6e8ee;--el-muted:#9aa1b0;--el-box:#262a36;--el-line:#5c6478;--el-accent:#ff7043;--el-accent-soft:#4a2c20;--el-primary:#7986cb;--el-primary-soft:#2b3152;--el-ok:#66bb6a;--el-bad:#ef5350}}
+.el-svg .box{fill:var(--el-box);stroke:var(--el-line);stroke-width:1.5}
+.el-svg .soft{fill:var(--el-primary-soft);stroke:var(--el-primary);stroke-width:1.5}
+.el-svg .title{fill:var(--el-fg);font-size:15px;font-weight:600}
+.el-svg .sub{fill:var(--el-muted);font-size:13px}
+.el-svg .mono{fill:var(--el-fg);font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+.el-svg .big{font-size:22px}
+.el-svg:not(.el-inline) .only-anim{display:none}
+</style>
+<rect class="box" x="20" y="20" width="420" height="240" rx="10"/>
+<text class="sub" x="230" y="42" text-anchor="middle">parsed top to bottom</text>
+<g data-active="1"><rect class="box" x="36" y="56" width="388" height="32" rx="6"/><text class="mono" x="52" y="77">A = "foo"</text></g>
+<g data-active="2"><rect class="box" x="36" y="96" width="388" height="32" rx="6"/><text class="mono" x="52" y="117">A:append = "bar"</text></g>
+<g data-active="3"><rect class="box" x="36" y="136" width="388" height="32" rx="6"/><text class="mono" x="52" y="157">A += "val"</text></g>
+<g data-active="4"><rect class="box" x="36" y="176" width="388" height="32" rx="6"/><text class="mono" x="52" y="197">A:remove = "foo"</text></g>
+<text class="mono" x="230" y="240" text-anchor="middle" data-active="5-6">— end of parsing —</text>
+<rect class="box" x="480" y="20" width="400" height="90" rx="10"/>
+<text class="sub" x="680" y="42" text-anchor="middle">value of A</text>
+<text class="mono big only-anim" x="680" y="84" text-anchor="middle" data-from="1" data-until="2">"foo"</text>
+<text class="mono big only-anim" x="680" y="84" text-anchor="middle" data-from="3" data-until="4">"foo val"</text>
+<text class="mono big only-anim" x="680" y="84" text-anchor="middle" data-from="5" data-until="5" data-active="5">"foo valbar"</text>
+<text class="mono big" x="680" y="84" text-anchor="middle" data-from="6" data-active="6">" valbar"</text>
+<rect class="box" x="480" y="130" width="400" height="130" rx="10"/>
+<text class="sub" x="680" y="152" text-anchor="middle">queued, applied only at the end</text>
+<g data-from="2" data-active="2,5"><rect class="soft" x="500" y="166" width="360" height="32" rx="6"/><text class="mono" x="680" y="187" text-anchor="middle">1. :append "bar"</text></g>
+<g data-from="4" data-active="4,6"><rect class="soft" x="500" y="208" width="360" height="32" rx="6"/><text class="mono" x="680" y="229" text-anchor="middle">2. :remove "foo"</text></g>
+</svg>

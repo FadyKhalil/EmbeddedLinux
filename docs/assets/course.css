@@ -1,0 +1,213 @@
+/* ---------- colours shared by the SVG diagrams ---------- */
+/* The SVG files carry their own fallback colours (for GitHub); once inlined
+   on the website they follow the Material light/dark palette instead. */
+svg.el-svg.el-inline {
+  --el-fg: var(--md-default-fg-color);
+  --el-muted: var(--md-default-fg-color--light);
+  --el-box: #f4f5fb;
+  --el-line: #9aa3b8;
+  --el-accent: var(--md-accent-fg-color);
+  --el-accent-soft: #fff0e8;
+  --el-primary: var(--md-primary-fg-color);
+  --el-primary-soft: #e8eaf6;
+  --el-ok: #2e7d32;
+  --el-bad: #c62828;
+  --el-code: var(--md-code-bg-color);
+}
+
+[data-md-color-scheme="slate"] svg.el-svg.el-inline {
+  --el-box: #262a36;
+  --el-line: #5c6478;
+  --el-accent-soft: #4a2c20;
+  --el-primary-soft: #2b3152;
+  --el-ok: #66bb6a;
+  --el-bad: #ef5350;
+}
+
+svg.el-svg.el-inline {
+  --el-fg: var(--md-default-fg-color);
+  --el-muted: var(--md-default-fg-color--light);
+}
+
+/* ---------- animated figures ---------- */
+figure.el-anim {
+  margin: 1.5em 0;
+  padding: 1em 1em 0.6em;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 12px;
+  background: var(--md-default-bg-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+figure.el-anim > img,
+figure.el-anim > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+/* the numbered list is the GitHub fallback; on the site the caption replaces it */
+figure.el-anim.el-anim-ready > .el-anim-steps,
+figure.el-anim.el-anim-ready > figcaption {
+  display: none;
+}
+
+.el-anim-caption {
+  min-height: 3.2em;
+  margin: 0.8em 0 0.6em;
+  padding: 0.6em 0.9em;
+  border-left: 4px solid var(--md-accent-fg-color);
+  border-radius: 0 8px 8px 0;
+  background: var(--md-code-bg-color);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.el-anim-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.el-anim-btn {
+  padding: 0.25em 0.75em;
+  border: 1px solid var(--md-default-fg-color--lighter);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--md-default-fg-color);
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.el-anim-btn:hover:not(:disabled) {
+  border-color: var(--md-accent-fg-color);
+  color: var(--md-accent-fg-color);
+}
+
+.el-anim-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.el-anim-dots {
+  display: flex;
+  gap: 0.3em;
+  margin-left: 0.4em;
+}
+
+.el-anim-dot {
+  width: 0.7em;
+  height: 0.7em;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--md-default-fg-color--lightest);
+  cursor: pointer;
+}
+
+.el-anim-dot.is-done { background: var(--md-primary-fg-color--light); }
+.el-anim-dot.is-current { background: var(--md-accent-fg-color); transform: scale(1.3); }
+
+.el-anim-counter {
+  margin-left: auto;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* state classes set by anim.js on elements inside the SVG */
+svg.el-inline [data-from],
+svg.el-inline [data-until] {
+  transition: opacity 0.45s ease;
+}
+
+svg.el-inline .is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+svg.el-inline [data-move] {
+  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+svg.el-inline .is-active .box,
+svg.el-inline .box.is-active {
+  fill: var(--el-accent-soft);
+  stroke: var(--el-accent);
+  stroke-width: 2.5;
+}
+
+svg.el-inline .is-active .title,
+svg.el-inline .title.is-active {
+  fill: var(--el-accent);
+}
+
+svg.el-inline .is-active .arrow,
+svg.el-inline .arrow.is-active {
+  stroke: var(--el-accent);
+  stroke-width: 2.5;
+}
+
+svg.el-inline .mono.is-active,
+svg.el-inline .is-active .mono {
+  fill: var(--el-accent);
+  font-weight: 700;
+}
+
+svg.el-inline .box,
+svg.el-inline .title,
+svg.el-inline .mono,
+svg.el-inline .arrow {
+  transition: fill 0.35s ease, stroke 0.35s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  svg.el-inline [data-from],
+  svg.el-inline [data-until],
+  svg.el-inline [data-move],
+  svg.el-inline .box,
+  svg.el-inline .title,
+  svg.el-inline .arrow {
+    transition: none;
+  }
+}
+
+/* ---------- lesson header table ---------- */
+.md-typeset table:not([class]) th:empty {
+  display: none;
+}
+
+/* ---------- home page ---------- */
+.el-hero {
+  margin: 0 0 1.5em;
+  padding: 1.6em 1.6em 1.2em;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--md-primary-fg-color), var(--md-primary-fg-color--dark));
+  color: var(--md-primary-bg-color);
+}
+
+.el-hero h1 {
+  margin: 0 0 0.3em;
+  color: inherit;
+  font-weight: 700;
+}
+
+.el-hero p {
+  margin: 0.4em 0;
+  opacity: 0.92;
+}
+
+.el-hero .md-button {
+  margin: 0.8em 0.6em 0 0;
+  border-color: var(--md-primary-bg-color);
+  color: var(--md-primary-bg-color);
+}
+
+.el-hero .md-button--primary {
+  border-color: var(--md-accent-fg-color);
+  background: var(--md-accent-fg-color);
+  color: var(--md-accent-bg-color);
+}

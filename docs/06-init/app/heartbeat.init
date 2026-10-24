@@ -1,0 +1,38 @@
+#!/bin/sh
+#
+# /etc/init.d/heartbeat - start and stop the heartbeat demo daemon.
+# Works with BusyBox init (called from /etc/inittab) and with System V init.
+
+DAEMON=/usr/bin/heartbeat
+PIDFILE=/tmp/heartbeat.pid
+
+case "$1" in
+	start)
+		echo "Starting heartbeat..."
+		# output goes to the console so you can watch it beat
+		$DAEMON -p $PIDFILE > /dev/console 2>&1 &
+		;;
+	stop)
+		echo "Stopping heartbeat..."
+		[ -f $PIDFILE ] && kill "$(cat $PIDFILE)"
+		# give it a moment to print its goodbye message
+		sleep 1
+		;;
+	restart)
+		$0 stop
+		$0 start
+		;;
+	status)
+		if [ -f $PIDFILE ] && kill -0 "$(cat $PIDFILE)" 2>/dev/null; then
+			echo "heartbeat is running (pid $(cat $PIDFILE))"
+		else
+			echo "heartbeat is not running"
+			exit 1
+		fi
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart|status}"
+		exit 1
+		;;
+esac
+exit 0

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="el-svg" width="900" height="290" viewBox="0 0 900 290" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<style>
+.el-svg:not(.el-inline){--el-fg:#1f2430;--el-muted:#5f6675;--el-box:#f4f5fb;--el-line:#9aa3b8;--el-accent:#ff5722;--el-accent-soft:#fff0e8;--el-primary:#3f51b5;--el-primary-soft:#e8eaf6;--el-ok:#2e7d32;--el-bad:#c62828}
+@media (prefers-color-scheme:dark){.el-svg:not(.el-inline){--el-fg:#e6e8ee;--el-muted:#9aa1b0;--el-box:#262a36;--el-line:#5c6478;--el-accent:#ff7043;--el-accent-soft:#4a2c20;--el-primary:#7986cb;--el-primary-soft:#2b3152;--el-ok:#66bb6a;--el-bad:#ef5350}}
+.el-svg .box{fill:var(--el-box);stroke:var(--el-line);stroke-width:1.5}
+.el-svg .soft{fill:var(--el-primary-soft);stroke:var(--el-primary);stroke-width:1.5}
+.el-svg .title{fill:var(--el-fg);font-size:15px;font-weight:600}
+.el-svg .sub{fill:var(--el-muted);font-size:13px}
+.el-svg .row{fill:var(--el-primary);font-size:13px;font-weight:700;letter-spacing:.06em}
+.el-svg .mono{fill:var(--el-fg);font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+.el-svg .arrow{stroke:var(--el-line);stroke-width:2;fill:none}
+.el-svg .dash{stroke-dasharray:6 4}
+.el-svg .ahead{fill:var(--el-line)}
+.el-svg .ok{fill:var(--el-ok);font-size:13px;font-weight:600}
+</style>
+<defs>
+<marker id="ah-link" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" class="ahead"/></marker>
+</defs>
+<text class="row" x="20" y="22">STATIC  (.a)</text>
+<g data-active="1"><rect class="box" x="20" y="34" width="120" height="34" rx="6"/><text class="mono" x="80" y="56" text-anchor="middle">main.o</text></g>
+<g data-active="1"><rect class="box" x="20" y="80" width="120" height="34" rx="6"/><text class="mono" x="80" y="102" text-anchor="middle">libmylib.a</text></g>
+<line class="arrow" x1="142" y1="51" x2="198" y2="68" marker-end="url(#ah-link)"/>
+<line class="arrow" x1="142" y1="97" x2="198" y2="82" marker-end="url(#ah-link)"/>
+<g data-active="1"><rect class="box" x="200" y="52" width="100" height="44" rx="8"/><text class="title" x="250" y="79" text-anchor="middle">linker</text></g>
+<line class="arrow" x1="302" y1="74" x2="356" y2="74" marker-end="url(#ah-link)"/>
+<rect class="box" x="360" y="30" width="200" height="92" rx="8"/>
+<text class="title" x="460" y="52" text-anchor="middle">my_program</text>
+<rect class="soft" x="375" y="62" width="170" height="22" rx="4"/><text class="mono" x="460" y="78" text-anchor="middle">main()</text>
+<g data-from="2" data-active="2"><rect class="box" x="375" y="90" width="170" height="22" rx="4"/><text class="mono" x="460" y="106" text-anchor="middle">add_numbers()  copied</text></g>
+<line class="arrow" x1="562" y1="76" x2="636" y2="76" marker-end="url(#ah-link)" data-from="3"/>
+<g data-from="3" data-active="3"><rect class="box" x="640" y="30" width="240" height="92" rx="8"/><text class="title" x="760" y="56" text-anchor="middle">Board</text><text class="sub" x="760" y="80" text-anchor="middle">the program runs on its own</text><text class="ok" x="760" y="104" text-anchor="middle">✓ no .so file needed</text></g>
+<text class="row" x="20" y="162">DYNAMIC  (.so)</text>
+<g data-active="4"><rect class="box" x="20" y="174" width="120" height="34" rx="6"/><text class="mono" x="80" y="196" text-anchor="middle">main.o</text></g>
+<g data-active="4"><rect class="box" x="20" y="220" width="120" height="34" rx="6"/><text class="mono" x="80" y="242" text-anchor="middle">libmylib.so</text></g>
+<line class="arrow" x1="142" y1="191" x2="198" y2="208" marker-end="url(#ah-link)"/>
+<line class="arrow" x1="142" y1="237" x2="198" y2="222" marker-end="url(#ah-link)"/>
+<g data-active="4"><rect class="box" x="200" y="192" width="100" height="44" rx="8"/><text class="title" x="250" y="219" text-anchor="middle">linker</text></g>
+<line class="arrow" x1="302" y1="214" x2="356" y2="214" marker-end="url(#ah-link)"/>
+<rect class="box" x="360" y="170" width="200" height="92" rx="8"/>
+<text class="title" x="460" y="192" text-anchor="middle">my_program</text>
+<rect class="soft" x="375" y="202" width="170" height="22" rx="4"/><text class="mono" x="460" y="218" text-anchor="middle">main()</text>
+<g data-from="4" data-active="4"><rect class="box dash" x="375" y="230" width="170" height="22" rx="4"/><text class="mono" x="460" y="246" text-anchor="middle">needs libmylib.so</text></g>
+<line class="arrow" x1="562" y1="216" x2="636" y2="216" marker-end="url(#ah-link)" data-from="5"/>
+<g data-from="5" data-active="5"><rect class="box" x="640" y="170" width="240" height="92" rx="8"/><text class="title" x="760" y="192" text-anchor="middle">Board</text><text class="mono" x="760" y="218" text-anchor="middle">ld-linux.so  (loader)</text><text class="mono" x="760" y="244" text-anchor="middle">/usr/lib/libmylib.so</text></g>
+<path class="arrow dash" d="M547,241 C600,262 640,262 680,248" marker-end="url(#ah-link)" data-from="5"/>
+</svg>
