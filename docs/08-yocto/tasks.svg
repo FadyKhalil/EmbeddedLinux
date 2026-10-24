@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="el-svg" viewBox="0 0 880 215" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" class="el-svg" width="880" height="215" viewBox="0 0 880 215" font-family="-apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
 <style>
 .el-svg:not(.el-inline){--el-fg:#1f2430;--el-muted:#5f6675;--el-box:#f4f5fb;--el-line:#9aa3b8;--el-accent:#ff5722;--el-accent-soft:#fff0e8;--el-primary:#3f51b5;--el-primary-soft:#e8eaf6;--el-ok:#2e7d32;--el-bad:#c62828}
 @media (prefers-color-scheme:dark){.el-svg:not(.el-inline){--el-fg:#e6e8ee;--el-muted:#9aa1b0;--el-box:#262a36;--el-line:#5c6478;--el-accent:#ff7043;--el-accent-soft:#4a2c20;--el-primary:#7986cb;--el-primary-soft:#2b3152;--el-ok:#66bb6a;--el-bad:#ef5350}}
